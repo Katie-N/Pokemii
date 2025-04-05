@@ -17,6 +17,7 @@ BLUE = (0, 0, 255)
 DARK_RED = (150, 0, 0)
 RED_COLOR = (255, 0, 0)
 PURPLE = (128, 0, 128)
+GOLD = (255, 215, 0)
 
 # Screen dimensions
 SCREEN_WIDTH = 1200
@@ -89,6 +90,9 @@ class Game:
         self.max_health = 100
         self.harden_active = False
         self.empower_active = False
+        self.experience = 0
+        self.experience_needed = 100
+        self.level = 1
 
     def opponent_turn(self):
         """Simulates the opponent's turn."""
@@ -108,7 +112,7 @@ class Game:
         damage_multiplier = 0.5 if self.harden_active else 1
         self.health -= damage * damage_multiplier
         if self.health <= 0 or self.health2 <= 0:
-            self.reset_game()
+            self.check_win()
 
     def _heal_opponent(self, heal_amount):
         """Heals the opponent."""
@@ -121,7 +125,7 @@ class Game:
         """Ends the current turn and switches to the next."""
         print("Turn Ended")
         if self.health <= 0 or self.health2 <= 0:
-            self.reset_game()
+            self.check_win()
         elif self.turn == 1:
             self.turn = 2
             self.opponent_turn()
@@ -134,7 +138,7 @@ class Game:
         damage_multiplier = 2 if self.empower_active else 1
         self.health2 -= 25 * damage_multiplier
         if self.health <= 0 or self.health2 <= 0:
-            self.reset_game()
+            self.check_win()
         self.end_turn()
         self.empower_active = False
 
@@ -154,6 +158,21 @@ class Game:
         """Handles the player's empower action."""
         self.empower_active = True
         self.end_turn()
+
+    def check_win(self):
+        """Checks if the player has won and updates experience."""
+        if self.health2 <= 0:
+            self.experience += 50  # Increase experience on win
+            self.check_level_up()
+        self.reset_game()
+
+    def check_level_up(self):
+        """Checks if the player has leveled up."""
+        while self.experience >= self.experience_needed:
+            self.level += 1
+            self.experience -= self.experience_needed
+            self.experience_needed += 50  # Increase experience needed for next level
+            print(f"Level Up! You are now level {self.level}!")
 
     def reset_game(self):
         """Resets the game state."""
@@ -192,6 +211,21 @@ def draw_health_bar(screen: pygame.Surface, x: int, y: int, width: int, height: 
         pygame.draw.rect(screen, effect_color, (x, y - 30, 50, 20))
         effect_text = pygame.font.Font(None, FONT_SIZE).render(status_effect, True, BLACK)
         screen.blit(effect_text, (x, y - 30))
+
+def draw_experience_bar(screen: pygame.Surface, x: int, y: int, width: int, height: int, experience: int, experience_needed: int, level: int):
+    """Draws the experience bar."""
+    if experience < 0:
+        experience = 0
+    
+    experience_percentage = experience / experience_needed
+    experience_width = int(width * experience_percentage)
+
+    pygame.draw.rect(screen, GRAY, (x, y, width, height))
+    pygame.draw.rect(screen, GOLD, (x, y, experience_width, height))
+    pygame.draw.rect(screen, BLACK, (x, y, width, height), 2)
+
+    level_text = pygame.font.Font(None, FONT_SIZE).render(f"Level: {level}", True, BLACK)
+    screen.blit(level_text, (x, y - 30))
 
 def draw_credits(screen: pygame.Surface, font: pygame.font.Font, large_font: pygame.font.Font, credits_back_button: Button):
     """Draws the credits screen."""
@@ -363,9 +397,8 @@ def main():
                 draw_game_menu(screen, game_menu_buttons[-1], game_menu_buttons[:-1])
                 draw_health_bar(screen, 20, 100, 200, 20, game.health, game.max_health, "Jimmy", "Harden" if game.harden_active else None)
                 draw_health_bar(screen, SCREEN_WIDTH - 220, 100, 200, 20, game.health2, game.max_health, "Opponent")
+                draw_experience_bar(screen, 20, 150, 200, 10, game.experience, game.experience_needed, game.level)
                 draw_turn(screen, game)
-                if game.health2 <= 0:
-                    game.reset_game()
             elif current_state == GameState.OPTIONS:
                 draw_options_menu(screen, options_buttons[-1], options_buttons[:-1])
 
