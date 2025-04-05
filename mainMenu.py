@@ -79,13 +79,7 @@ def calculate_button_positions():
     right_button_x = int(SCREEN_WIDTH * 0.52083)
     next_button_x = int(SCREEN_WIDTH * 0.9333)
     next_button_y = int(SCREEN_HEIGHT * 0.347222)
-
-    option1_button_x = int(SCREEN_WIDTH * 0.3)
-    option1_button_y = int(SCREEN_HEIGHT * 0.4)
-    option2_button_x = int(SCREEN_WIDTH * 0.3)
-    option2_button_y = int(SCREEN_HEIGHT * 0.55)
-    back_button_x = int(SCREEN_WIDTH * 0.05)
-    back_button_y = int(SCREEN_HEIGHT * 0.8)
+    back_button_x = int(SCREEN_WIDTH * 0.033333)
 
     return (
         button_y,
@@ -93,12 +87,7 @@ def calculate_button_positions():
         right_button_x,
         next_button_x,
         next_button_y,
-        option1_button_x,
-        option1_button_y,
-        option2_button_x,
-        option2_button_y,
         back_button_x,
-        back_button_y,
     )
 
 def handle_menu_sliding(second_menu_visible, menu_offset, menu_slide_speed):
@@ -156,11 +145,6 @@ def draw_main_menu(screen, pic1, menu_offset, title_font, button_positions):
         next_button_x,
         next_button_y,
         _,
-        _,
-        _,
-        _,
-        _,
-        _,
     ) = button_positions
 
     train_button = create_button(
@@ -204,23 +188,18 @@ def draw_second_menu(screen, pic2, menu_offset, title_font, button_positions):
     draw_text("Options", title_font, BLACK, second_menu_surface, SCREEN_WIDTH // 2 - 80, 50)
 
     (
-        _,
-        _,
-        _,
-        _,
-        _,
-        option1_button_x,
-        option1_button_y,
-        option2_button_x,
-        option2_button_y,
+        button_y,
+        left_button_x,
+        right_button_x,
+        next_button_x,
+        next_button_y,
         back_button_x,
-        back_button_y,
     ) = button_positions
 
     option1_button = create_button(
         "Option 1",
-        option1_button_x,
-        option1_button_y,
+        left_button_x,
+        button_y,
         MAIN_BUTTON_WIDTH,
         MAIN_BUTTON_HEIGHT,
         BUTTON_COLOR,
@@ -229,8 +208,8 @@ def draw_second_menu(screen, pic2, menu_offset, title_font, button_positions):
     )
     option2_button = create_button(
         "Option 2",
-        option2_button_x,
-        option2_button_y,
+        right_button_x,
+        button_y,
         MAIN_BUTTON_WIDTH,
         MAIN_BUTTON_HEIGHT,
         BUTTON_COLOR,
@@ -240,7 +219,7 @@ def draw_second_menu(screen, pic2, menu_offset, title_font, button_positions):
     back_button = create_button(
         "Back",
         back_button_x,
-        back_button_y,
+        next_button_y,
         NAV_BUTTON_WIDTH,
         NAV_BUTTON_HEIGHT,
         BUTTON_COLOR,
