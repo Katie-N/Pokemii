@@ -1,3 +1,4 @@
+import random
 import pygame
 
 # Initialize Pygame
@@ -23,6 +24,7 @@ dark_red = (150, 0, 0)
 red_color = (255,0,0)
 
 # Font
+turn_font = pygame.font.Font(None, 50)
 font = pygame.font.Font(None, 36)
 large_font = pygame.font.Font(None, 72)
 
@@ -85,16 +87,45 @@ def test_print(message):
     print(message)
 
 def back_to_menu():
-    global current_state
+    global current_state, turn
     current_state = GameState.MENU
-def end_turn1():
-     print("Turn Ended")
+    turn = 1
+def opponent_turn():
+    global health, health2, turn
+    moves = ["Kick", "Heal", "Stomp", "Scratch"]
+    chosen_move = random.choice(moves)
+    print(f"Opponent used {chosen_move}!")
+
+    if chosen_move == "Kick":
+        health -= 5
+        print("Opponent kicked Jimmy!")
+    elif chosen_move == "Heal":
+        max_health = 100
+        if health2 < max_health: #added to make sure health does not go above max health
+            health2 += 10
+        print("Opponent healed itself!")
+    elif chosen_move == "Stomp":
+        health -= 10
+        print("Opponent stomped Jimmy!")
+    elif chosen_move == "Scratch":
+        health -= 20
+        print("Opponent scratched Jimmy!")
+    end_turn()
+
+def end_turn():
+    global turn, health, health2
+    print("Turn Ended")
+    if turn == 1:
+        turn = 2
+        opponent_turn()
+    elif turn == 2:
+        turn = 1
 
 def game_button_action1(): #Kick
     global health2
     print("Game Kick clicked!")
     health2 -= 5
-    end_turn1()
+    end_turn()
 
 def game_button_action2(): #Heal
     global health
@@ -102,14 +133,18 @@ def game_button_action2(): #Heal
     max_health = 100
     if health < max_health:
         health += 20
-    end_turn1()
+    end_turn()
 def game_button_action3():
     print("Game Button 3 clicked!")
-    end_turn1()
+    end_turn()
 
 def game_button_action4():
     print("Game Button 4 clicked!")
-    end_turn1()
+    end_turn()
+
+def draw_turn(screen, turn):
+    turn_text = turn_font.render(f"Turn {turn}", True, black)
+    screen.blit(turn_text, (screen_width // 2 - 50, 20))
 
 # --- Button Creation ---
 button_width = 300
@@ -229,6 +264,7 @@ def draw_health_bar_opponent(screen, x, y, width, height, health):
 running = True
 game_buttons = []
 health = 100
+turn = 1
 health2 = 100
 while running:
     for event in pygame.event.get():
@@ -263,7 +299,7 @@ while running:
         game_buttons = draw_game_menu(screen)
         draw_health_bar_jimmy(screen, 20, 100, 200, 20, health)  # added to draw the healthbar
         draw_health_bar_opponent(screen, screen_width-220, 100, 200, 20, health2) #draw the second health bar
-
+        draw_turn(screen, turn)
     # Update the display
     pygame.display.flip()
 
