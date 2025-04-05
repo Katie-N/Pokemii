@@ -1,11 +1,37 @@
 import pygame
 import os
-from typing import List
-from constants import *
-from buttons import Button
-from actions import *
-from game import Game
 
+# Initialize Pygame
+pygame.init()
+
+# --- Constants ---
+# Colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+BLUE = (0, 0, 255)
+
+# Screen dimensions
+infoObject = pygame.display.Info()
+MAX_WIDTH = infoObject.current_w
+MAX_HEIGHT = infoObject.current_h
+
+if MAX_WIDTH / MAX_HEIGHT >= 16 / 9:
+    SCREEN_HEIGHT = MAX_HEIGHT
+    SCREEN_WIDTH = int(SCREEN_HEIGHT * 16 / 9)
+else:
+    SCREEN_WIDTH = MAX_WIDTH
+    SCREEN_HEIGHT = int(SCREEN_WIDTH * 9 / 16)
+
+SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
+
+# Button dimensions
+MAIN_BUTTON_WIDTH = int(SCREEN_WIDTH * 0.286458)
+MAIN_BUTTON_HEIGHT = int(SCREEN_HEIGHT * 0.1398148)
+NAV_BUTTON_WIDTH = int(SCREEN_WIDTH * 0.0322916)
+NAV_BUTTON_HEIGHT = int(SCREEN_HEIGHT * 0.084259)
+BUTTON_TEXT_COLOR = WHITE
+
+# --- Functions ---
 def draw_text(text, font, color, surface, x, y):
     """Draws text on the screen."""
     textobj = font.render(text, True, color)
@@ -86,8 +112,7 @@ def handle_events(
     importMii_button,
     tradeMii_button,
     back_button,
-    second_menu_visible,
-    game: Game
+    second_menu_visible
 ):
     """Handles events in the main menu."""
     for event in pygame.event.get():
@@ -99,8 +124,7 @@ def handle_events(
                 print("Train button clicked!")
             if compete_button.collidepoint(mouse_pos):
                 print("Compete button clicked!")
-                start_game(game)
-                return False, False, second_menu_visible
+                return True, False, second_menu_visible
             if next_button.collidepoint(mouse_pos):
                 return False, False, True
             if importMii_button.collidepoint(mouse_pos):
@@ -127,30 +151,30 @@ def draw_main_menu(screen, pic1, menu_offset, title_font, button_positions):
     ) = button_positions
 
     train_button = create_button(
-        "Train",
+        "",
         left_button_x,
         button_y,
         MAIN_BUTTON_WIDTH,
         MAIN_BUTTON_HEIGHT,
-        WHITE,
+        BUTTON_TEXT_COLOR,
         first_menu_surface,
     )
     compete_button = create_button(
-        "Compete",
+        "",
         right_button_x,
         button_y,
         MAIN_BUTTON_WIDTH,
         MAIN_BUTTON_HEIGHT,
-        WHITE,
+        BUTTON_TEXT_COLOR,
         first_menu_surface,
     )
     next_button = create_button(
-        ">",
+        "",
         next_button_x,
         next_button_y,
         NAV_BUTTON_WIDTH,
         NAV_BUTTON_HEIGHT,
-        WHITE,
+        BUTTON_TEXT_COLOR,
         first_menu_surface,
     )
 
@@ -173,39 +197,38 @@ def draw_second_menu(screen, pic2, menu_offset, title_font, button_positions):
     ) = button_positions
 
     importMii_button = create_button(
-        "Import Mii",
+        "",
         left_button_x,
         button_y,
         MAIN_BUTTON_WIDTH,
         MAIN_BUTTON_HEIGHT,
-        WHITE,
+        BUTTON_TEXT_COLOR,
         second_menu_surface,
     )
     tradeMii_button = create_button(
-        "Trade Mii",
+        "",
         right_button_x,
         button_y,
         MAIN_BUTTON_WIDTH,
         MAIN_BUTTON_HEIGHT,
-        WHITE,
+        BUTTON_TEXT_COLOR,
         second_menu_surface,
     )
     back_button = create_button(
-        "<",
+        "",
         back_button_x,
         next_button_y,
         NAV_BUTTON_WIDTH,
         NAV_BUTTON_HEIGHT,
-        WHITE,
+        BUTTON_TEXT_COLOR,
         second_menu_surface,
     )
 
     screen.blit(second_menu_surface, (menu_offset + SCREEN_WIDTH, 0))
     return importMii_button, tradeMii_button, back_button
 
-def main_menu(game: Game):
+def main_menu():
     """Displays the main menu."""
-    global current_state
     screen = pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption("Main Menu")
 
@@ -213,7 +236,7 @@ def main_menu(game: Game):
     assets_path = os.path.join(".", "assets", "menus")
     pic1, pic2 = load_images(assets_path)
     if pic1 is None or pic2 is None:
-        return False
+        return
 
     # Font for the title
     title_font = pygame.font.Font(None, 64)
@@ -232,12 +255,11 @@ def main_menu(game: Game):
         train_button, compete_button, next_button = draw_main_menu(screen, pic1, menu_offset, title_font, button_positions)
         importMii_button, tradeMii_button, back_button = draw_second_menu(screen, pic2, menu_offset, title_font, button_positions)
         
-        quit_game, back_to_main, second_menu_visible = handle_events(train_button, compete_button, next_button, importMii_button, tradeMii_button, back_button, second_menu_visible, game)
+        quit_game, back_to_main, second_menu_visible = handle_events(train_button, compete_button, next_button, importMii_button, tradeMii_button, back_button, second_menu_visible)
         if quit_game:
-            return False
+            running = False
         if back_to_main:
             second_menu_visible = False
-            current_state = GameState.MAIN_MENU
 
         # --- Menu Sliding Logic ---
         menu_offset = handle_menu_sliding(second_menu_visible, menu_offset, menu_slide_speed)
@@ -253,6 +275,9 @@ def main_menu(game: Game):
             importMii_button, tradeMii_button, back_button = draw_second_menu(screen, pic2, menu_offset, title_font, button_positions)
 
         pygame.display.flip()
-        if current_state != GameState.MAIN_MENU:
-            running = False
-    return True
+
+    pygame.quit()
+
+# --- Main ---
+if __name__ == "__main__":
+    main_menu()

@@ -1,65 +1,85 @@
 import pygame
+pygame.init()
 import os
-import mainMenu
+from game import Game
+from mainMenu import main_menu
+from buttons import Button
+from drawing import *
+from actions import *
+from constants import *
 
 # Initialize Pygame
-pygame.init()
 
-# --- Constants ---
-# Colors
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GREEN = (0, 255, 0)
 
-# Screen dimensions
-infoObject = pygame.display.Info()
-MAX_WIDTH = infoObject.current_w
-MAX_HEIGHT = infoObject.current_h
-
-if MAX_WIDTH / MAX_HEIGHT >= 16 / 9:
-    SCREEN_HEIGHT = MAX_HEIGHT
-    SCREEN_WIDTH = int(SCREEN_HEIGHT * 16 / 9)
-else:
-    SCREEN_WIDTH = MAX_WIDTH
-    SCREEN_HEIGHT = int(SCREEN_WIDTH * 9 / 16)
-
-SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
-
-# --- Functions ---
-def draw_text(text, font, color, surface, x, y):
-    """Draws text on the screen."""
-    textobj = font.render(text, True, color)
-    textrect = textobj.get_rect()
-    textrect.topleft = (x, y)
-    surface.blit(textobj, textrect)
-
+# --- Main Game Loop ---
 def main():
     """Main game loop."""
     screen = pygame.display.set_mode(SCREEN_SIZE)
-    pygame.display.set_caption("My Game")
+    pygame.display.set_caption("Pokemii")
 
-    # Font for the title
-    title_font = pygame.font.Font(None, 64)
+    # Fonts (Consolidated)
+    font = pygame.font.Font(None, FONT_SIZE)
+    large_font = pygame.font.Font(None, LARGE_FONT_SIZE)
+    console_font = pygame.font.Font(None, CONSOLE_FONT_SIZE)
+
+    # Game instance
+    game = Game()
+
+    # Button Creation (Consolidated)
+    from buttons import Button
+    from actions import create_menu_buttons, create_credits_buttons, create_game_menu_buttons, create_options_buttons, close_console
+    menu_buttons = create_menu_buttons(font, game)
+    credits_buttons = create_credits_buttons(font, game)
+    game_menu_buttons = create_game_menu_buttons(font, game)
+    options_buttons = create_options_buttons(font, game)
+    close_console_button = Button(SCREEN_WIDTH - 30, SCREEN_HEIGHT - 200, 20, 20, "X", RED, DARK_RED, console_font, close_console, game) #added the close console button
 
     running = True
-    while running:
-        # Handle events
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
+    try:
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                if current_state == GameState.MAIN_MENU:
+                    for button in menu_buttons:
+                        button.handle_event(event)
+                elif current_state == GameState.CREDITS:
+                    for button in credits_buttons:
+                        button.handle_event(event)
+                elif current_state == GameState.GAME_MENU:
+                    for button in game_menu_buttons:
+                        button.handle_event(event)
+                    if game.show_console:
+                        close_console_button.handle_event(event)
+                elif current_state == GameState.OPTIONS_MENU:
+                    for button in options_buttons:
+                        button.handle_event(event)
 
-        # --- Game Logic ---
-        # (Add your game logic here)
+            screen.fill(WHITE)
 
-        # Draw everything
-        screen.fill(GREEN)
-        draw_text("Game is Running!", title_font, BLACK, screen, SCREEN_WIDTH // 2 - 150, SCREEN_HEIGHT // 2 - 32)
+            if current_state == GameState.MAIN_MENU:
+                for button in menu_buttons:
+                    button.draw(screen)
+            elif current_state == GameState.CREDITS:
+                draw_credits(screen, font, large_font, credits_buttons[0])
+            elif current_state == GameState.GAME_MENU:
+                # Draw everything else first
+                draw_game_menu(screen, game_menu_buttons[-1], game_menu_buttons[:-1], game, close_console_button)
+                draw_health_bar(screen, 20, 100, 200, 20, game.health, game.max_health, "Jimmy", "Harden" if game.harden_active else None)
+                draw_health_bar(screen, SCREEN_WIDTH - 220, 100, 200, 20, game.health2, game.max_health, "Opponent")
+                draw_experience_bar(screen, 20, 150, 200, 10, game.experience, game.experience_needed, game.level)
+                draw_turn(screen, game)
+            elif current_state == GameState.OPTIONS_MENU:
+                draw_options_menu(screen, options_buttons[-1], options_buttons[:-1])
 
-        pygame.display.flip()
+            pygame.display.flip()
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    finally:
+        pygame.quit()
 
-    pygame.quit()
-
-# --- Main ---
+# --- Entry Point ---
 if __name__ == "__main__":
-    if mainMenu.main_menu():
+    game = Game()
+    if main_menu(game):
         main()
