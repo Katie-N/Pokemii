@@ -45,3 +45,8 @@ def back_to_menu(game: Game):
 def close_console(game: Game):
     """Closes the console log."""
     game.show_console = False
+
+def open_game_menu():
+     """Opens the game menu."""
+     global current_state
+     current_state = GameState.GAME_MENU

@@ -27,12 +27,14 @@ def main():
 
     # Button Creation (Consolidated)
     from buttons import Button
-    from actions import create_menu_buttons, create_credits_buttons, create_game_menu_buttons, create_options_buttons, close_console
+    from actions import create_menu_buttons, create_credits_buttons, create_game_menu_buttons, create_options_buttons, close_console, open_game_menu #added open_game_menu
     menu_buttons = create_menu_buttons(font, game)
     credits_buttons = create_credits_buttons(font, game)
     game_menu_buttons = create_game_menu_buttons(font, game)
     options_buttons = create_options_buttons(font, game)
     close_console_button = Button(SCREEN_WIDTH - 30, SCREEN_HEIGHT - 200, 20, 20, "X", RED, DARK_RED, console_font, close_console, game) #added the close console button
+    # Create the "Game Menu" button
+    game_menu_button = Button(20, 20, 150, 50, "Game Menu", LIGHT_BLUE, GRAY, font, open_game_menu) #added the game menu button
 
     running = True
     try:
@@ -43,6 +45,7 @@ def main():
                 if current_state == GameState.MAIN_MENU:
                     for button in menu_buttons:
                         button.handle_event(event)
+                    game_menu_button.handle_event(event) #added the game menu button
                 elif current_state == GameState.CREDITS:
                     for button in credits_buttons:
                         button.handle_event(event)
@@ -60,6 +63,7 @@ def main():
             if current_state == GameState.MAIN_MENU:
                 for button in menu_buttons:
                     button.draw(screen)
+                game_menu_button.draw(screen) #added the game menu button
             elif current_state == GameState.CREDITS:
                 draw_credits(screen, font, large_font, credits_buttons[0])
             elif current_state == GameState.GAME_MENU:

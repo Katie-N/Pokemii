@@ -87,7 +87,8 @@ def handle_events(
     tradeMii_button,
     back_button,
     second_menu_visible,
-    game: Game
+    game: Game,
+    game_menu_button #added game_menu_button
 ):
     """Handles events in the main menu."""
     for event in pygame.event.get():
@@ -95,23 +96,26 @@ def handle_events(
             return True, False, second_menu_visible
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = pygame.mouse.get_pos()
-            if train_button.collidepoint(mouse_pos):
+            if train_button.rect.collidepoint(mouse_pos): #changed to train_button.rect.collidepoint
                 print("Train button clicked!")
-            if compete_button.collidepoint(mouse_pos):
+            if compete_button.rect.collidepoint(mouse_pos): #changed to compete_button.rect.collidepoint
                 print("Compete button clicked!")
                 start_game(game)
                 return False, False, second_menu_visible
-            if next_button.collidepoint(mouse_pos):
+            if next_button.rect.collidepoint(mouse_pos): #changed to next_button.rect.collidepoint
                 return False, False, True
-            if importMii_button.collidepoint(mouse_pos):
+            if importMii_button.rect.collidepoint(mouse_pos): #changed to importMii_button.rect.collidepoint
                 print("Import Mii button clicked!")
-            if tradeMii_button.collidepoint(mouse_pos):
+            if tradeMii_button.rect.collidepoint(mouse_pos): #changed to tradeMii_button.rect.collidepoint
                 print("Trade Mii button clicked!")
-            if back_button.collidepoint(mouse_pos):
+            if back_button.rect.collidepoint(mouse_pos): #changed to back_button.rect.collidepoint
                 return False, True, False
+            if game_menu_button.rect.collidepoint(mouse_pos): #added the game menu button
+                open_game_menu()
+                return False, False, second_menu_visible
     return False, False, second_menu_visible
 
-def draw_main_menu(screen, pic1, menu_offset, title_font, button_positions):
+def draw_main_menu(screen, pic1, menu_offset, title_font, button_positions, game_menu_button): #added the game menu button
     """Draws the main menu."""
     first_menu_surface = pygame.Surface(SCREEN_SIZE, pygame.SRCALPHA)
     first_menu_surface.blit(pic1, (0, 0))
@@ -153,6 +157,7 @@ def draw_main_menu(screen, pic1, menu_offset, title_font, button_positions):
         WHITE,
         first_menu_surface,
     )
+    game_menu_button.draw(first_menu_surface) #added the game menu button
 
     screen.blit(first_menu_surface, (menu_offset, 0))
     return train_button, compete_button, next_button
@@ -225,14 +230,16 @@ def main_menu(game: Game):
     menu_offset = 0
     menu_slide_speed = 20
     second_menu_visible = False
+    # Create the "Game Menu" button
+    game_menu_button = Button(20, 20, 150, 50, "Game Menu", LIGHT_BLUE, GRAY, pygame.font.Font(None, FONT_SIZE), open_game_menu) #added the game menu button
 
     running = True
     while running:
         # Handle events
-        train_button, compete_button, next_button = draw_main_menu(screen, pic1, menu_offset, title_font, button_positions)
+        train_button, compete_button, next_button = draw_main_menu(screen, pic1, menu_offset, title_font, button_positions, game_menu_button) #added the game menu button
         importMii_button, tradeMii_button, back_button = draw_second_menu(screen, pic2, menu_offset, title_font, button_positions)
         
-        quit_game, back_to_main, second_menu_visible = handle_events(train_button, compete_button, next_button, importMii_button, tradeMii_button, back_button, second_menu_visible, game)
+        quit_game, back_to_main, second_menu_visible = handle_events(train_button, compete_button, next_button, importMii_button, tradeMii_button, back_button, second_menu_visible, game, game_menu_button) #added the game menu button
         if quit_game:
             return False
         if back_to_main:
@@ -246,7 +253,7 @@ def main_menu(game: Game):
         screen.fill(BLACK)
 
         # Draw Main Menu
-        train_button, compete_button, next_button = draw_main_menu(screen, pic1, menu_offset, title_font, button_positions)
+        train_button, compete_button, next_button = draw_main_menu(screen, pic1, menu_offset, title_font, button_positions, game_menu_button) #added the game menu button
 
         # Draw Second Menu
         if second_menu_visible or menu_offset > -SCREEN_WIDTH:
