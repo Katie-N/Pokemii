@@ -64,6 +64,7 @@ class GameState:
     GAME_MENU = 2
 
 current_state = GameState.MENU
+
 # --- Game Variables ---
 health = 100
 health2 = 100
@@ -111,8 +112,6 @@ def opponent_turn():
     elif chosen_move == "Heal":
         if health2 < max_health: #added to make sure health does not go above max health
             health2 += 10
-        if health2 > max_health: #added to make sure health does not go above max health
-            health2 = max_health
         print("Opponent healed itself!")
     elif chosen_move == "Stomp":
         health -= 10
@@ -144,8 +143,6 @@ def game_button_action2(): #Heal
     print("Game Heal clicked!")
     if health < max_health:
         health += 20
-    if health > max_health: #added to make sure health does not go above max health
-        health = max_health
     end_turn()
 def game_button_action3():
     print("Game Button 3 clicked!")
