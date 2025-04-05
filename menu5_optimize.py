@@ -1,9 +1,5 @@
 import globalSettings
-
-import random
 import pygame
-from enum import Enum
-
 from game import Game, GameState
 import draw
 import buttons
@@ -28,7 +24,6 @@ def main():
     game_menu_buttons = buttons.create_game_menu_buttons(font, game)
     options_buttons = buttons.create_options_buttons(font, game)
 
-    
     globalSettings.current_state = GameState.MENU
 
     running = True
@@ -58,6 +53,7 @@ def main():
             elif globalSettings.current_state == GameState.CREDITS:
                 draw.draw_credits(screen, font, large_font, credits_buttons[0])
             elif globalSettings.current_state == GameState.GAME_MENU:
+                # Draw the initial game menu
                 draw.draw_game_menu(screen, game_menu_buttons[-1], game_menu_buttons[:-1])
                 draw.draw_health_bar(screen, 20, 100, 200, 20, game.health, game.max_health, "Jimmy", "Harden" if game.harden_active else None)
                 draw.draw_health_bar(screen, globalSettings.SCREEN_WIDTH - 220, 100, 200, 20, game.health2, game.max_health, "Opponent")
