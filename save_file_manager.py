@@ -46,26 +46,26 @@ class SaveFileManager:
         except Exception as e:
             print(f"Error saving data: {e}")
 
-    def choose_save_file(self):
-        """Allows the user to choose a save file from the console."""
-        save_files = self.get_save_files()
+    # def choose_save_file(self):
+    #     """Allows the user to choose a save file from the console."""
+    #     save_files = self.get_save_files()
 
-        if not save_files:
-            new_data = [{"name": "Player 1", "score": 100}, {"name": "Player 2", "score": 150}]
-            print("No save files found.")
-            name = input("Name for new save:")
-            self.save_data(f"{name}.csv", new_data)
-            return self.get_save_files()[0]
-        else:
-            print("Available save files:")
-            for i, filename in enumerate(save_files):
-                print(f"{i + 1}. {filename}")
-            while True:
-                try:
-                    choice = int(input("Enter the number of the save file to load: "))
-                    if 1 <= choice <= len(save_files):
-                        return save_files[choice - 1]
-                    else:
-                        print("Invalid choice. Please enter a number from the list.")
-                except ValueError:
-                    print("Invalid input. Please enter a number.")
+    #     if not save_files:
+    #         new_data = [{"name": "Player 1", "score": 100}, {"name": "Player 2", "score": 150}]
+    #         print("No save files found.")
+    #         name = input("Name for new save:")
+    #         self.save_data(f"{name}.csv", new_data)
+    #         return self.get_save_files()[0]
+    #     else:
+    #         print("Available save files:")
+    #         for i, filename in enumerate(save_files):
+    #             print(f"{i + 1}. {filename}")
+    #         while True:
+    #             try:
+    #                 choice = int(input("Enter the number of the save file to load: "))
+    #                 if 1 <= choice <= len(save_files):
+    #                     return save_files[choice - 1]
+    #                 else:
+    #                     print("Invalid choice. Please enter a number from the list.")
+    #             except ValueError:
+    #                 print("Invalid input. Please enter a number.")
