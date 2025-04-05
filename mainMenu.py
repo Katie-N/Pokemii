@@ -25,8 +25,10 @@ else:
 SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
 
 # Button dimensions
-BUTTON_WIDTH = int(SCREEN_WIDTH*0.286458)
-BUTTON_HEIGHT = int(SCREEN_HEIGHT*0.1398148)
+MAIN_BUTTON_WIDTH = int(SCREEN_WIDTH*0.286458)
+MAIN_BUTTON_HEIGHT = int(SCREEN_HEIGHT*0.1398148)
+NAV_BUTTON_WIDTH = int(SCREEN_WIDTH*0.0322916)
+NAV_BUTTON_HEIGHT = int(SCREEN_HEIGHT*0.084259)
 BUTTON_COLOR = BLUE
 BUTTON_TEXT_COLOR = WHITE
 
@@ -74,9 +76,9 @@ def calculate_button_positions():
     """Calculates button positions relative to the screen."""
     button_y = int(SCREEN_HEIGHT * 0.77222)
     left_button_x = int(SCREEN_WIDTH * 0.1916)
-    right_button_x = int(SCREEN_WIDTH * 0.75)
-    more_button_x = int(SCREEN_WIDTH * 0.9)
-    more_button_y = int(SCREEN_HEIGHT * 0.3)
+    right_button_x = int(SCREEN_WIDTH * 0.52083)
+    next_button_x = int(SCREEN_WIDTH * 0.9333)
+    next_button_y = int(SCREEN_HEIGHT * 0.347222)
 
     option1_button_x = int(SCREEN_WIDTH * 0.3)
     option1_button_y = int(SCREEN_HEIGHT * 0.4)
@@ -89,8 +91,8 @@ def calculate_button_positions():
         button_y,
         left_button_x,
         right_button_x,
-        more_button_x,
-        more_button_y,
+        next_button_x,
+        next_button_y,
         option1_button_x,
         option1_button_y,
         option2_button_x,
@@ -114,7 +116,7 @@ def handle_menu_sliding(second_menu_visible, menu_offset, menu_slide_speed):
 def handle_events(
     train_button,
     compete_button,
-    more_button,
+    next_button,
     option1_button,
     option2_button,
     back_button,
@@ -131,7 +133,7 @@ def handle_events(
             if compete_button.collidepoint(mouse_pos):
                 print("Quit button clicked!")
                 return True, False, second_menu_visible
-            if more_button.collidepoint(mouse_pos):
+            if next_button.collidepoint(mouse_pos):
                 return False, False, True
             if option1_button.collidepoint(mouse_pos):
                 print("Option 1 button clicked!")
@@ -151,8 +153,8 @@ def draw_main_menu(screen, pic1, menu_offset, title_font, button_positions):
         button_y,
         left_button_x,
         right_button_x,
-        more_button_x,
-        more_button_y,
+        next_button_x,
+        next_button_y,
         _,
         _,
         _,
@@ -165,8 +167,8 @@ def draw_main_menu(screen, pic1, menu_offset, title_font, button_positions):
         "Train",
         left_button_x,
         button_y,
-        BUTTON_WIDTH,
-        BUTTON_HEIGHT,
+        MAIN_BUTTON_WIDTH,
+        MAIN_BUTTON_HEIGHT,
         BUTTON_COLOR,
         BUTTON_TEXT_COLOR,
         first_menu_surface,
@@ -175,25 +177,25 @@ def draw_main_menu(screen, pic1, menu_offset, title_font, button_positions):
         "Compete",
         right_button_x,
         button_y,
-        BUTTON_WIDTH,
-        BUTTON_HEIGHT,
+        MAIN_BUTTON_WIDTH,
+        MAIN_BUTTON_HEIGHT,
         BUTTON_COLOR,
         BUTTON_TEXT_COLOR,
         first_menu_surface,
     )
-    more_button = create_button(
+    next_button = create_button(
         "More",
-        more_button_x,
-        more_button_y,
-        BUTTON_WIDTH,
-        BUTTON_HEIGHT,
+        next_button_x,
+        next_button_y,
+        NAV_BUTTON_WIDTH,
+        NAV_BUTTON_HEIGHT,
         BUTTON_COLOR,
         BUTTON_TEXT_COLOR,
         first_menu_surface,
     )
 
     screen.blit(first_menu_surface, (menu_offset, 0))
-    return train_button, compete_button, more_button
+    return train_button, compete_button, next_button
 
 def draw_second_menu(screen, pic2, menu_offset, title_font, button_positions):
     """Draws the second menu."""
@@ -219,8 +221,8 @@ def draw_second_menu(screen, pic2, menu_offset, title_font, button_positions):
         "Option 1",
         option1_button_x,
         option1_button_y,
-        BUTTON_WIDTH,
-        BUTTON_HEIGHT,
+        MAIN_BUTTON_WIDTH,
+        MAIN_BUTTON_HEIGHT,
         BUTTON_COLOR,
         BUTTON_TEXT_COLOR,
         second_menu_surface,
@@ -229,8 +231,8 @@ def draw_second_menu(screen, pic2, menu_offset, title_font, button_positions):
         "Option 2",
         option2_button_x,
         option2_button_y,
-        BUTTON_WIDTH,
-        BUTTON_HEIGHT,
+        MAIN_BUTTON_WIDTH,
+        MAIN_BUTTON_HEIGHT,
         BUTTON_COLOR,
         BUTTON_TEXT_COLOR,
         second_menu_surface,
@@ -239,8 +241,8 @@ def draw_second_menu(screen, pic2, menu_offset, title_font, button_positions):
         "Back",
         back_button_x,
         back_button_y,
-        BUTTON_WIDTH,
-        BUTTON_HEIGHT,
+        NAV_BUTTON_WIDTH,
+        NAV_BUTTON_HEIGHT,
         BUTTON_COLOR,
         BUTTON_TEXT_COLOR,
         second_menu_surface,
@@ -274,10 +276,10 @@ def main_menu():
     running = True
     while running:
         # Handle events
-        train_button, compete_button, more_button = draw_main_menu(screen, pic1, menu_offset, title_font, button_positions)
+        train_button, compete_button, next_button = draw_main_menu(screen, pic1, menu_offset, title_font, button_positions)
         option1_button, option2_button, back_button = draw_second_menu(screen, pic2, menu_offset, title_font, button_positions)
         
-        quit_game, back_to_main, second_menu_visible = handle_events(train_button, compete_button, more_button, option1_button, option2_button, back_button, second_menu_visible)
+        quit_game, back_to_main, second_menu_visible = handle_events(train_button, compete_button, next_button, option1_button, option2_button, back_button, second_menu_visible)
         if quit_game:
             running = False
         if back_to_main:
@@ -290,7 +292,7 @@ def main_menu():
         screen.fill(BLACK)
 
         # Draw Main Menu
-        train_button, compete_button, more_button = draw_main_menu(screen, pic1, menu_offset, title_font, button_positions)
+        train_button, compete_button, next_button = draw_main_menu(screen, pic1, menu_offset, title_font, button_positions)
 
         # Draw Second Menu
         if second_menu_visible or menu_offset > -SCREEN_WIDTH:
