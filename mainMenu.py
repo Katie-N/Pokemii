@@ -39,13 +39,22 @@ def draw_text(text, font, color, surface, x, y):
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
 
-def create_button(text, x, y, width, height, text_color, surface, action=None):
-    """Creates a transparent button and returns its rectangle."""
+def create_button(text, x, y, width, height, text_color, surface, action=None, image_path=None):
+    """Creates a button, optionally with an image, and returns its rectangle."""
     button_rect = pygame.Rect(x, y, width, height)
     # Create a transparent surface for the button
     button_surface = pygame.Surface((width, height), pygame.SRCALPHA)
     # Draw a semi-transparent rectangle (optional, for a subtle button effect)
     pygame.draw.rect(button_surface, (0, 0, 0, 0), (0, 0, width, height))  # Last value is alpha (0-255)
+    
+    if image_path:
+        try:
+            image = pygame.image.load(image_path).convert_alpha()
+            image = pygame.transform.scale(image, (width, height))
+            button_surface.blit(image, (0, 0))
+        except pygame.error as e:
+            print(f"Error loading image: {e}")
+    
     surface.blit(button_surface, (x,y))
     font = pygame.font.Font(None, 36)
     draw_text(text, font, text_color, surface, x + 10, y + 10)
@@ -83,6 +92,8 @@ def calculate_button_positions():
     next_button_x = int(SCREEN_WIDTH * 0.9333)
     next_button_y = int(SCREEN_HEIGHT * 0.347222)
     back_button_x = int(SCREEN_WIDTH * 0.033333)
+    pick_save_x = 0
+    pick_save_y = 0
 
     return (
         button_y,
@@ -91,6 +102,8 @@ def calculate_button_positions():
         next_button_x,
         next_button_y,
         back_button_x,
+        pick_save_x,
+        pick_save_y,
     )
 
 def handle_menu_sliding(second_menu_visible, menu_offset, menu_slide_speed):
@@ -109,6 +122,7 @@ def handle_events(
     train_button,
     compete_button,
     next_button,
+    save_button,
     importMii_button,
     tradeMii_button,
     back_button,
@@ -141,23 +155,28 @@ def handle_events(
                     print("Compete button clicked!")
                     if compete_button[1]:
                         compete_button[1]()
+                if save_button[0].collidepoint(mouse_pos):
+                    print("Save button clicked!")
+                        
                 if back_button[0].collidepoint(mouse_pos):
                     return False, True, False
     return False, False, second_menu_visible
+
+# DRAW MII CHANNEL MENU
 
 def draw_main_menu(screen, pic1, menu_offset, title_font, button_positions):
     """Draws the main menu."""
     first_menu_surface = pygame.Surface(SCREEN_SIZE, pygame.SRCALPHA)
     first_menu_surface.blit(pic1, (0, 0))
-    draw_text("My Game", title_font, WHITE, first_menu_surface, SCREEN_WIDTH // 2 - 80, 50)
-
     (
         button_y,
         left_button_x,
         right_button_x,
         next_button_x,
         next_button_y,
-        _,
+        back_button_x,
+        pick_save_x,
+        pick_save_y,
     ) = button_positions
 
     def import_mii_action():
@@ -199,6 +218,8 @@ def draw_main_menu(screen, pic1, menu_offset, title_font, button_positions):
     screen.blit(first_menu_surface, (menu_offset, 0))
     return importMii_button, tradeMii_button, next_button
 
+# DRAW TRAINING MENU
+
 def draw_second_menu(screen, pic2, menu_offset, title_font, button_positions):
     """Draws the second menu."""
     second_menu_surface = pygame.Surface(SCREEN_SIZE, pygame.SRCALPHA)
@@ -209,6 +230,8 @@ def draw_second_menu(screen, pic2, menu_offset, title_font, button_positions):
         next_button_x,
         next_button_y,
         back_button_x,
+        pick_save_x,
+        pick_save_y,
     ) = button_positions
 
     def train_action():
@@ -246,9 +269,23 @@ def draw_second_menu(screen, pic2, menu_offset, title_font, button_positions):
         BUTTON_TEXT_COLOR,
         second_menu_surface,
     )
+    
+    assets_path = os.path.join(".", "assets")
+    save_image_path = os.path.join(assets_path, "save.png")
+    
+    save_button = create_button(
+        "Pick Save",
+        pick_save_x,
+        pick_save_y,
+        50,
+        50,
+        BLACK,
+        second_menu_surface,
+        image_path=save_image_path
+    )
 
     screen.blit(second_menu_surface, (menu_offset + SCREEN_WIDTH, 0))
-    return train_button, compete_button, back_button
+    return train_button, compete_button, back_button, save_button
 
 def main_menu():
     """Displays the main menu."""
@@ -276,9 +313,9 @@ def main_menu():
     while running:
         # Handle events
         importMii_button, tradeMii_button, next_button = draw_main_menu(screen, pic1, menu_offset, title_font, button_positions)
-        train_button, compete_button, back_button = draw_second_menu(screen, pic2, menu_offset, title_font, button_positions)
+        train_button, compete_button, back_button, save_button = draw_second_menu(screen, pic2, menu_offset, title_font, button_positions)
         
-        quit_game, back_to_main, second_menu_visible = handle_events(train_button, compete_button, next_button, importMii_button, tradeMii_button, back_button, second_menu_visible)
+        quit_game, back_to_main, second_menu_visible = handle_events(train_button, compete_button, next_button, save_button, importMii_button, tradeMii_button, back_button, second_menu_visible)
         if quit_game:
             running = False
         if back_to_main:
@@ -295,7 +332,7 @@ def main_menu():
 
         # Draw Second Menu
         if second_menu_visible or menu_offset > -SCREEN_WIDTH:
-            train_button, compete_button, back_button = draw_second_menu(screen, pic2, menu_offset, title_font, button_positions)
+            train_button, compete_button, back_button, save_button = draw_second_menu(screen, pic2, menu_offset, title_font, button_positions)
 
         pygame.display.flip()
 
