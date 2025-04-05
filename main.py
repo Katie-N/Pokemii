@@ -37,6 +37,7 @@ def main():
     """Main game loop."""
     screen = pygame.display.set_mode(SCREEN_SIZE)
     pygame.display.set_caption("My Game")
+    pygame.mouse.set_cursor(pygame.cursors.Cursor(pygame.SYSTEM_CURSOR_HAND))
 
     # Font for the title
     title_font = pygame.font.Font(None, 64)
