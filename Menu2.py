@@ -20,6 +20,7 @@ red = (255, 0, 0)
 yellow = (255, 255, 0)
 blue = (0, 0, 255)
 dark_red = (150, 0, 0)
+red_color = (255,0,0)
 
 # Font
 font = pygame.font.Font(None, 36)
@@ -86,20 +87,29 @@ def test_print(message):
 def back_to_menu():
     global current_state
     current_state = GameState.MENU
+def end_turn1():
+     print("Turn Ended")
 
 def game_button_action1(): #Kick
     global health2
     print("Game Kick clicked!")
     health2 -= 5
+    end_turn1()
 
-def game_button_action2():
-    print("Game Button 2 clicked!")
-
+def game_button_action2(): #Heal
+    global health
+    print("Game Heal clicked!")
+    max_health = 100
+    if health < max_health:
+        health += 20
+    end_turn1()
 def game_button_action3():
     print("Game Button 3 clicked!")
+    end_turn1()
 
 def game_button_action4():
     print("Game Button 4 clicked!")
+    end_turn1()
 
 # --- Button Creation ---
 button_width = 300
@@ -147,8 +157,13 @@ def draw_game_menu(screen):
     # Draw the solid blue circle - moved higher up
     circle_radius = 100
     circle_x = circle_radius + 150  # Moved to the right
-    circle_y = screen_height - circle_radius - 250  # Moved up even higher (increased from 100 to 250)
+    circle_y = screen_height - circle_radius - 300  # Moved up even higher (increased from 100 to 300)
     pygame.draw.circle(screen, blue, (circle_x, circle_y), circle_radius)
+    # Draw the solid red circle
+    circle_radius = 100
+    circle_x_red = screen_width - circle_radius - 150  # Moved to the left
+    circle_y_red = circle_radius + 250  # Moved down
+    pygame.draw.circle(screen, red_color, (circle_x_red, circle_y_red), circle_radius)
 
     game_menu_back_button.draw(screen)
 
@@ -159,7 +174,7 @@ def draw_game_menu(screen):
     game_buttons = [
         Button(0, game_button_y, game_button_width, game_button_height, "Kick", light_blue, gray,
                game_button_action1),
-        Button(0, game_button_y + game_button_height, game_button_width, game_button_height, "Button 2", light_blue,
+        Button(0, game_button_y + game_button_height, game_button_width, game_button_height, "Heal", light_blue,
                gray, game_button_action2),  # Under Kick
         Button(game_button_width, game_button_y, game_button_width, game_button_height, "Button 3", light_blue,
                gray, game_button_action3),
