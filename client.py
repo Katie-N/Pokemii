@@ -1,5 +1,7 @@
-import random
 import pygame
+import socket
+import threading
+import json
 
 # Initialize Pygame
 pygame.init()
@@ -22,6 +24,7 @@ yellow = (255, 255, 0)
 blue = (0, 0, 255)
 dark_red = (150, 0, 0)
 red_color = (255,0,0)
+purple = (128,0,128)
 
 # Font
 turn_font = pygame.font.Font(None, 50)
@@ -64,19 +67,25 @@ class GameState:
     GAME_MENU = 2
 
 current_state = GameState.MENU
+
 # --- Game Variables ---
-health = 100
-health2 = 100
+player1_health = 100
+player2_health = 100
 turn = 1
 max_health = 100
+harden_active = False
+empower_active = False
+
+# --- Network Variables ---
+HOST = '127.0.0.1'  # Server IP address
+PORT = 5555
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect((HOST, PORT))
 
 # --- Button Actions ---
 def start_game():
-    global current_state, health, health2, turn
+    global current_state
     current_state = GameState.GAME_MENU
-    health = 100
-    health2 = 100
-    turn = 1
 
 def options():
     print("Opening Options!")
@@ -95,65 +104,30 @@ def test_print(message):
     print(message)
 
 def back_to_menu():
-    global current_state, turn
+    global current_state
     current_state = GameState.MENU
-    turn = 1
 
-def opponent_turn():
-    global health, health2, turn
-    moves = ["Kick", "Heal", "Stomp", "Scratch"]
-    chosen_move = random.choice(moves)
-    print(f"Opponent used {chosen_move}!")
-
-    if chosen_move == "Kick":
-        health -= 5
-        print("Opponent kicked Jimmy!")
-    elif chosen_move == "Heal":
-        if health2 < max_health: #added to make sure health does not go above max health
-            health2 += 10
-        if health2 > max_health: #added to make sure health does not go above max health
-            health2 = max_health
-        print("Opponent healed itself!")
-    elif chosen_move == "Stomp":
-        health -= 10
-        print("Opponent stomped Jimmy!")
-    elif chosen_move == "Scratch":
-        health -= 20
-        print("Opponent scratched Jimmy!")
-    end_turn()
-
-def end_turn():
-    global turn, health, health2
-    print("Turn Ended")
-    if health <= 0:
-        start_game()
-    elif turn == 1:
-        turn = 2
-        opponent_turn()
-    elif turn == 2:
-        turn = 1
+def send_action(action):
+    global client_socket
+    data = {'action': action}
+    data_json = json.dumps(data)
+    client_socket.sendall(data_json.encode())
 
 def game_button_action1(): #Kick
-    global health2
     print("Game Kick clicked!")
-    health2 -= 5
-    end_turn()
+    send_action("Kick")
 
 def game_button_action2(): #Heal
-    global health
     print("Game Heal clicked!")
-    if health < max_health:
-        health += 20
-    if health > max_health: #added to make sure health does not go above max health
-        health = max_health
-    end_turn()
-def game_button_action3():
-    print("Game Button 3 clicked!")
-    end_turn()
+    send_action("Heal")
 
-def game_button_action4():
-    print("Game Button 4 clicked!")
-    end_turn()
+def game_button_action3(): #Harden
+    print("Game Harden clicked!")
+    send_action("Harden")
+
+def game_button_action4(): #Empower
+    print("Game Empower clicked!")
+    send_action("Empower")
 
 def draw_turn(screen, turn):
     turn_text = turn_font.render(f"Turn {turn}", True, black)
@@ -224,10 +198,10 @@ def draw_game_menu(screen):
                game_button_action1),
         Button(0, game_button_y + game_button_height, game_button_width, game_button_height, "Heal", light_blue,
                gray, game_button_action2),  # Under Kick
-        Button(game_button_width, game_button_y, game_button_width, game_button_height, "Button 3", light_blue,
+        Button(game_button_width, game_button_y, game_button_width, game_button_height, "Harden", light_blue,
                gray, game_button_action3),
         Button(game_button_width, game_button_y + game_button_height, game_button_width, game_button_height,
-               "Button 4", light_blue, gray, game_button_action4),  # Under button 3
+               "Empower", light_blue, gray, game_button_action4),  # Under button 3
     ]
 
     for button in game_buttons:
@@ -263,30 +237,50 @@ def draw_health_bar_jimmy(screen, x, y, width, height, health):
     #Draw the name
     name_text = font.render("Jimmy", True, black)
     screen.blit(name_text, (x, y+height+5))
+    if harden_active:
+        pygame.draw.rect(screen, blue, (x, y-30, 50, 20))
+        harden_text = font.render("Harden", True, black)
+        screen.blit(harden_text, (x, y-30))
+    if empower_active:
+        pygame.draw.rect(screen, purple, (x+50, y-30, 50, 20))
+        empower_text = font.render("Empower", True, black)
+        screen.blit(empower_text, (x+50, y-30))
+
 def draw_health_bar_opponent(screen, x, y, width, height, health):
     draw_health_bar(screen, x, y, width, height, health)
     #Draw the name
     name_text = font.render("Opponent", True, black)
     screen.blit(name_text, (x, y+height+5))
-  
- 
 
+def receive_game_state():
+    global player1_health, player2_health, turn, harden_active, empower_active
+    while True:
+        try:
+            data = client_socket.recv(1024).decode()
+            if not data:
+                break
+            game_state = json.loads(data)
+            player1_health = game_state['player1_health']
+            player2_health = game_state['player2_health']
+            turn = game_state['turn']
+            harden_active = game_state['harden_active']
+            empower_active = game_state['empower_active']
+        except Exception as e:
+            print(f"Error receiving game state: {e}")
+            break
+
+# Start receiving game state in a separate thread
+receive_thread = threading.Thread(target=receive_game_state)
+receive_thread.daemon = True
+receive_thread.start()
 
 # Game loop
 running = True
 game_buttons = []
-health = 100
-turn = 1
-health2 = 100
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.KEYDOWN:  # added to modify health
-            if event.key == pygame.K_LEFT:
-                health -= 5
-            if event.key == pygame.K_RIGHT:
-                health += 5
         if current_state == GameState.MENU:
             for button in menu_buttons:
                 button.handle_event(event)
@@ -309,8 +303,8 @@ while running:
         draw_credits(screen)
     elif current_state == GameState.GAME_MENU:
         game_buttons = draw_game_menu(screen)
-        draw_health_bar_jimmy(screen, 20, 100, 200, 20, health)  # added to draw the healthbar
-        draw_health_bar_opponent(screen, screen_width-220, 100, 200, 20, health2) #draw the second health bar
+        draw_health_bar_jimmy(screen, 20, 100, 200, 20, player1_health)  # added to draw the healthbar
+        draw_health_bar_opponent(screen, screen_width-220, 100, 200, 20, player2_health) #draw the second health bar
         draw_turn(screen, turn)
     # Update the display
     pygame.display.flip()

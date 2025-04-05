@@ -22,6 +22,7 @@ yellow = (255, 255, 0)
 blue = (0, 0, 255)
 dark_red = (150, 0, 0)
 red_color = (255,0,0)
+purple = (128,0,128)
 
 # Font
 turn_font = pygame.font.Font(None, 50)
@@ -64,19 +65,24 @@ class GameState:
     GAME_MENU = 2
 
 current_state = GameState.MENU
+
 # --- Game Variables ---
 health = 100
 health2 = 100
 turn = 1
 max_health = 100
+harden_active = False
+empower_active = False
 
 # --- Button Actions ---
 def start_game():
-    global current_state, health, health2, turn
+    global current_state, health, health2, turn, harden_active, empower_active
     current_state = GameState.GAME_MENU
     health = 100
     health2 = 100
     turn = 1
+    harden_active = False
+    empower_active = False
 
 def options():
     print("Opening Options!")
@@ -95,18 +101,21 @@ def test_print(message):
     print(message)
 
 def back_to_menu():
-    global current_state, turn
+    global current_state, turn, harden_active, empower_active
     current_state = GameState.MENU
     turn = 1
+    harden_active = False
+    empower_active = False
 
 def opponent_turn():
-    global health, health2, turn
+    global health, health2, turn, harden_active
     moves = ["Kick", "Heal", "Stomp", "Scratch"]
     chosen_move = random.choice(moves)
     print(f"Opponent used {chosen_move}!")
+    damage_multiplier = 0.5 if harden_active else 1
 
     if chosen_move == "Kick":
-        health -= 5
+        health -= 5 * damage_multiplier
         print("Opponent kicked Jimmy!")
     elif chosen_move == "Heal":
         if health2 < max_health: #added to make sure health does not go above max health
@@ -115,29 +124,33 @@ def opponent_turn():
             health2 = max_health
         print("Opponent healed itself!")
     elif chosen_move == "Stomp":
-        health -= 10
+        health -= 10 * damage_multiplier
         print("Opponent stomped Jimmy!")
     elif chosen_move == "Scratch":
-        health -= 20
+        health -= 20 * damage_multiplier
         print("Opponent scratched Jimmy!")
     end_turn()
 
 def end_turn():
-    global turn, health, health2
+    global turn, health, health2, harden_active, empower_active
     print("Turn Ended")
-    if health <= 0:
+    if health <= 0 or health2 <= 0: #added to make sure that the game restarts if the opponent's health is 0
         start_game()
     elif turn == 1:
         turn = 2
         opponent_turn()
     elif turn == 2:
         turn = 1
+        harden_active = False #harden is only active for 1 turn
+        
 
 def game_button_action1(): #Kick
-    global health2
+    global health2, empower_active
     print("Game Kick clicked!")
-    health2 -= 5
+    damage_multiplier = 2 if empower_active else 1
+    health2 -= 25 * damage_multiplier
     end_turn()
+    empower_active = False #empower is only active for 1 turn
 
 def game_button_action2(): #Heal
     global health
@@ -147,12 +160,16 @@ def game_button_action2(): #Heal
     if health > max_health: #added to make sure health does not go above max health
         health = max_health
     end_turn()
-def game_button_action3():
-    print("Game Button 3 clicked!")
+def game_button_action3(): #Harden
+    global harden_active
+    print("Game Harden clicked!")
+    harden_active = True
     end_turn()
 
-def game_button_action4():
-    print("Game Button 4 clicked!")
+def game_button_action4(): #Empower
+    global empower_active
+    print("Game Empower clicked!")
+    empower_active = True
     end_turn()
 
 def draw_turn(screen, turn):
@@ -224,10 +241,10 @@ def draw_game_menu(screen):
                game_button_action1),
         Button(0, game_button_y + game_button_height, game_button_width, game_button_height, "Heal", light_blue,
                gray, game_button_action2),  # Under Kick
-        Button(game_button_width, game_button_y, game_button_width, game_button_height, "Button 3", light_blue,
+        Button(game_button_width, game_button_y, game_button_width, game_button_height, "Harden", light_blue,
                gray, game_button_action3),
         Button(game_button_width, game_button_y + game_button_height, game_button_width, game_button_height,
-               "Button 4", light_blue, gray, game_button_action4),  # Under button 3
+               "Empower", light_blue, gray, game_button_action4),  # Under button 3
     ]
 
     for button in game_buttons:
@@ -263,6 +280,15 @@ def draw_health_bar_jimmy(screen, x, y, width, height, health):
     #Draw the name
     name_text = font.render("Jimmy", True, black)
     screen.blit(name_text, (x, y+height+5))
+    if harden_active:
+        pygame.draw.rect(screen, blue, (x, y-30, 50, 20))
+        harden_text = font.render("Harden", True, black)
+        screen.blit(harden_text, (x, y-30))
+    if empower_active:
+        pygame.draw.rect(screen, purple, (x+50, y-30, 50, 20))
+        empower_text = font.render("Empower", True, black)
+        screen.blit(empower_text, (x+50, y-30))
+
 def draw_health_bar_opponent(screen, x, y, width, height, health):
     draw_health_bar(screen, x, y, width, height, health)
     #Draw the name
@@ -278,6 +304,8 @@ game_buttons = []
 health = 100
 turn = 1
 health2 = 100
+harden_active = False
+empower_active = False
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
