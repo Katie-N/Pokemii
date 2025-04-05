@@ -3,6 +3,7 @@ from game import Game
 from buttons import Button
 import pygame
 from typing import List
+import buttonsFromRect
 
 # --- Drawing Functions ---
 def draw_turn(screen: pygame.Surface, game: Game):
@@ -89,3 +90,145 @@ def draw_options_menu(screen: pygame.Surface, options_back_button: Button, optio
 
     for button in options_buttons:
         button.draw(screen)
+
+# From mainMenu.py
+def draw_text(text, font, color, surface, x, y):
+    """Draws text on the screen."""
+    textobj = font.render(text, True, color)
+    textrect = textobj.get_rect()
+    textrect.topleft = (x, y)
+    surface.blit(textobj, textrect)
+
+    
+# DRAW MII CHANNEL MENU
+def draw_main_menu(screen, images, menu_offset, title_font, button_positions):
+    """Draws the main menu."""
+    first_menu_surface = pygame.Surface(globalSettings.SCREEN_SIZE, pygame.SRCALPHA)
+    first_menu_surface.blit(images["mii_channel"], (0, 0))
+    (
+        button_y,
+        left_button_x,
+        right_button_x,
+        next_button_x,
+        next_button_y,
+        back_button_x,
+        pick_save_x,
+        pick_save_y,
+    ) = button_positions
+
+    def import_mii_action():
+        print("Importing Mii...")
+
+    def trade_mii_action():
+        print("Trading Mii...")
+
+    importMii_button = buttonsFromRect.create_button(
+        "",
+        left_button_x,
+        button_y,
+        globalSettings.MAIN_BUTTON_WIDTH,
+        globalSettings.MAIN_BUTTON_HEIGHT,
+        globalSettings.BUTTON_TEXT_COLOR,
+        first_menu_surface,
+        import_mii_action
+    )
+    tradeMii_button = buttonsFromRect.create_button(
+        "",
+        right_button_x,
+        button_y,
+        globalSettings.MAIN_BUTTON_WIDTH,
+        globalSettings.MAIN_BUTTON_HEIGHT,
+        globalSettings.BUTTON_TEXT_COLOR,
+        first_menu_surface,
+        trade_mii_action
+    )
+    next_button = buttonsFromRect.create_button(
+        "",
+        next_button_x,
+        next_button_y,
+        globalSettings.NAV_BUTTON_WIDTH,
+        globalSettings.NAV_BUTTON_HEIGHT,
+        globalSettings.BUTTON_TEXT_COLOR,
+        first_menu_surface,
+    )
+
+    screen.blit(first_menu_surface, (menu_offset, 0))
+    return importMii_button, tradeMii_button, next_button
+
+# DRAW TRAINING MENU
+
+def draw_second_menu(screen, images, menu_offset, title_font, button_positions):
+    """Draws the second menu."""
+    second_menu_surface = pygame.Surface(globalSettings.SCREEN_SIZE, pygame.SRCALPHA)
+    second_menu_surface.blit(images["fight_menu"], (0, 0))
+    (   button_y,
+        left_button_x,
+        right_button_x,
+        next_button_x,
+        next_button_y,
+        back_button_x,
+        pick_save_x,
+        pick_save_y,
+    ) = button_positions
+
+    def train_action():
+        print("Training...")
+
+    def compete_action():
+        print("Competing...")
+
+    train_button = buttonsFromRect.create_button(
+        "",
+        left_button_x,
+        button_y,
+        globalSettings.MAIN_BUTTON_WIDTH,
+        globalSettings.MAIN_BUTTON_HEIGHT,
+        globalSettings.BUTTON_TEXT_COLOR,
+        second_menu_surface,
+        train_action
+    )
+    compete_button = buttonsFromRect.create_button(
+        "",
+        right_button_x,
+        button_y,
+        globalSettings.MAIN_BUTTON_WIDTH,
+        globalSettings.MAIN_BUTTON_HEIGHT,
+        globalSettings.BUTTON_TEXT_COLOR,
+        second_menu_surface,
+        compete_action
+    )
+    back_button = buttonsFromRect.create_button(
+        "",
+        back_button_x,
+        next_button_y,
+        globalSettings.NAV_BUTTON_WIDTH,
+        globalSettings.NAV_BUTTON_HEIGHT,
+        globalSettings.BUTTON_TEXT_COLOR,
+        second_menu_surface,
+    )
+
+    screen.blit(second_menu_surface, (menu_offset + globalSettings.SCREEN_WIDTH, 0))
+    return train_button, compete_button, back_button
+
+def draw_save_menu(screen, save_menu_buttons):
+    """Draws the save options menu."""
+    save_menu_surface = pygame.Surface(globalSettings.SCREEN_SIZE, pygame.SRCALPHA)
+    save_menu_surface.fill((100,100,100, 150))
+    for button in save_menu_buttons:
+        # Calculate the button's position
+        button_x = globalSettings.SCREEN_WIDTH // 2 - globalSettings.SAVE_MENU_BUTTON_WIDTH // 2
+        button_y = globalSettings.SCREEN_HEIGHT // 2 - (len(save_menu_buttons) * globalSettings.SAVE_MENU_BUTTON_SPACING) // 2 + (save_menu_buttons.index(button) * SAVE_MENU_BUTTON_SPACING)
+        
+        # Update the button's rectangle
+        button[0].x = button_x
+        button[0].y = button_y
+        button[0].width = globalSettings.SAVE_MENU_BUTTON_WIDTH
+        button[0].height = globalSettings.SAVE_MENU_BUTTON_HEIGHT
+        button[0].topleft = (button_x, button_y)
+        
+        # Draw the button
+        pygame.draw.rect(save_menu_surface, (200,200,200), button[0])
+        
+        # Draw the text
+        draw_text(button[2], pygame.font.Font(None, 36), globalSettings.BLACK, save_menu_surface, button_x + 10, button_y + 10)
+    screen.blit(save_menu_surface, (0,0))

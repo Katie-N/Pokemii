@@ -3,6 +3,7 @@ import pygame
 from game import Game, GameState
 import draw
 import buttons
+import buttonsFromRect
 
 # --- Main Game Loop ---
 def main():
