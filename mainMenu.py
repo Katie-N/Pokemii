@@ -25,11 +25,10 @@ else:
 SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
 
 # Button dimensions
-MAIN_BUTTON_WIDTH = int(SCREEN_WIDTH*0.286458)
-MAIN_BUTTON_HEIGHT = int(SCREEN_HEIGHT*0.1398148)
-NAV_BUTTON_WIDTH = int(SCREEN_WIDTH*0.0322916)
-NAV_BUTTON_HEIGHT = int(SCREEN_HEIGHT*0.084259)
-BUTTON_COLOR = BLUE
+MAIN_BUTTON_WIDTH = int(SCREEN_WIDTH * 0.286458)
+MAIN_BUTTON_HEIGHT = int(SCREEN_HEIGHT * 0.1398148)
+NAV_BUTTON_WIDTH = int(SCREEN_WIDTH * 0.0322916)
+NAV_BUTTON_HEIGHT = int(SCREEN_HEIGHT * 0.084259)
 BUTTON_TEXT_COLOR = WHITE
 
 # --- Functions ---
@@ -40,10 +39,14 @@ def draw_text(text, font, color, surface, x, y):
     textrect.topleft = (x, y)
     surface.blit(textobj, textrect)
 
-def create_button(text, x, y, width, height, color, text_color, surface):
-    """Creates a button and returns its rectangle."""
+def create_button(text, x, y, width, height, text_color, surface):
+    """Creates a transparent button and returns its rectangle."""
     button_rect = pygame.Rect(x, y, width, height)
-    pygame.draw.rect(surface, color, button_rect)
+    # Create a transparent surface for the button
+    button_surface = pygame.Surface((width, height), pygame.SRCALPHA)
+    # Draw a semi-transparent rectangle (optional, for a subtle button effect)
+    pygame.draw.rect(button_surface, (0, 0, 0, 128), (0, 0, width, height))  # Last value is alpha (0-255)
+    surface.blit(button_surface, (x,y))
     font = pygame.font.Font(None, 36)
     draw_text(text, font, text_color, surface, x + 10, y + 10)
     return button_rect
@@ -153,7 +156,6 @@ def draw_main_menu(screen, pic1, menu_offset, title_font, button_positions):
         button_y,
         MAIN_BUTTON_WIDTH,
         MAIN_BUTTON_HEIGHT,
-        BUTTON_COLOR,
         BUTTON_TEXT_COLOR,
         first_menu_surface,
     )
@@ -163,7 +165,6 @@ def draw_main_menu(screen, pic1, menu_offset, title_font, button_positions):
         button_y,
         MAIN_BUTTON_WIDTH,
         MAIN_BUTTON_HEIGHT,
-        BUTTON_COLOR,
         BUTTON_TEXT_COLOR,
         first_menu_surface,
     )
@@ -173,7 +174,6 @@ def draw_main_menu(screen, pic1, menu_offset, title_font, button_positions):
         next_button_y,
         NAV_BUTTON_WIDTH,
         NAV_BUTTON_HEIGHT,
-        BUTTON_COLOR,
         BUTTON_TEXT_COLOR,
         first_menu_surface,
     )
@@ -202,7 +202,6 @@ def draw_second_menu(screen, pic2, menu_offset, title_font, button_positions):
         button_y,
         MAIN_BUTTON_WIDTH,
         MAIN_BUTTON_HEIGHT,
-        BUTTON_COLOR,
         BUTTON_TEXT_COLOR,
         second_menu_surface,
     )
@@ -212,7 +211,6 @@ def draw_second_menu(screen, pic2, menu_offset, title_font, button_positions):
         button_y,
         MAIN_BUTTON_WIDTH,
         MAIN_BUTTON_HEIGHT,
-        BUTTON_COLOR,
         BUTTON_TEXT_COLOR,
         second_menu_surface,
     )
@@ -222,7 +220,6 @@ def draw_second_menu(screen, pic2, menu_offset, title_font, button_positions):
         next_button_y,
         NAV_BUTTON_WIDTH,
         NAV_BUTTON_HEIGHT,
-        BUTTON_COLOR,
         BUTTON_TEXT_COLOR,
         second_menu_surface,
     )
