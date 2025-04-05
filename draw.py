@@ -1,6 +1,6 @@
 import globalSettings
 from game import Game
-from menu5_optimize import Button
+from buttons import Button
 import pygame
 from typing import List
 
