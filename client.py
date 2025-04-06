@@ -2,6 +2,7 @@ import pygame
 import socket
 import threading
 import json
+from game import Game  # Import the Game class
 
 # Initialize Pygame
 pygame.init()
@@ -23,8 +24,8 @@ red = (255, 0, 0)
 yellow = (255, 255, 0)
 blue = (0, 0, 255)
 dark_red = (150, 0, 0)
-red_color = (255,0,0)
-purple = (128,0,128)
+red_color = (255, 0, 0)
+purple = (128, 0, 128)
 
 # Font
 turn_font = pygame.font.Font(None, 50)
@@ -69,12 +70,7 @@ class GameState:
 current_state = GameState.MENU
 
 # --- Game Variables ---
-player1_health = 100
-player2_health = 100
-turn = 1
-max_health = 100
-harden_active = False
-empower_active = False
+game = Game()  # Create an instance of the Game class
 
 # --- Network Variables ---
 HOST = '127.0.0.1'  # Server IP address
@@ -106,28 +102,40 @@ def test_print(message):
 def back_to_menu():
     global current_state
     current_state = GameState.MENU
+    game.reset_game()
 
+# --- Network Actions ---
 def send_action(action):
     global client_socket
-    data = {'action': action}
-    data_json = json.dumps(data)
-    client_socket.sendall(data_json.encode())
+    try:
+        data = {'action': action}
+        data_json = json.dumps(data)
+        client_socket.sendall(data_json.encode())
+    except (socket.error, ConnectionResetError) as e:
+        print(f"Error sending action: {e}")
+        # Handle disconnection or attempt to reconnect here
+    except Exception as e:
+        print(f"Error sending action: {e}")
 
-def game_button_action1(): #Kick
+def game_button_action1():  # Kick
     print("Game Kick clicked!")
-    send_action("Kick")
+    game.player_kick()  # Call the game logic
+    send_action("Kick")  # send the action to the server
 
-def game_button_action2(): #Heal
+def game_button_action2():  # Heal
     print("Game Heal clicked!")
-    send_action("Heal")
+    game.player_heal()  # Call the game logic
+    send_action("Heal")  # send the action to the server
 
-def game_button_action3(): #Harden
+def game_button_action3():  # Harden
     print("Game Harden clicked!")
-    send_action("Harden")
+    game.player_harden()  # Call the game logic
+    send_action("Harden")  # send the action to the server
 
-def game_button_action4(): #Empower
+def game_button_action4():  # Empower
     print("Game Empower clicked!")
-    send_action("Empower")
+    game.player_empower()  # Call the game logic
+    send_action("Empower")  # send the action to the server
 
 def draw_turn(screen, turn):
     turn_text = turn_font.render(f"Turn {turn}", True, black)
@@ -211,12 +219,12 @@ def draw_game_menu(screen):
 
 # --- Health Bar ---
 def draw_health_bar(screen, x, y, width, height, health):
-    #health_bar variables
+    # health_bar variables
     if health < 0:
         health = 0
 
     # Calculate health bar
-    health_percentage = health / max_health
+    health_percentage = health / game.max_health
 
     # Draw the background
     pygame.draw.rect(screen, gray, (x, y, width, height))
@@ -234,37 +242,44 @@ def draw_health_bar(screen, x, y, width, height, health):
 
 def draw_health_bar_jimmy(screen, x, y, width, height, health):
     draw_health_bar(screen, x, y, width, height, health)
-    #Draw the name
+    # Draw the name
     name_text = font.render("Jimmy", True, black)
-    screen.blit(name_text, (x, y+height+5))
-    if harden_active:
-        pygame.draw.rect(screen, blue, (x, y-30, 50, 20))
+    screen.blit(name_text, (x, y + height + 5))
+    if game.harden_active:
+        pygame.draw.rect(screen, blue, (x, y - 30, 50, 20))
         harden_text = font.render("Harden", True, black)
-        screen.blit(harden_text, (x, y-30))
-    if empower_active:
-        pygame.draw.rect(screen, purple, (x+50, y-30, 50, 20))
+        screen.blit(harden_text, (x, y - 30))
+    if game.empower_active:
+        pygame.draw.rect(screen, purple, (x + 50, y - 30, 50, 20))
         empower_text = font.render("Empower", True, black)
-        screen.blit(empower_text, (x+50, y-30))
+        screen.blit(empower_text, (x + 50, y - 30))
 
 def draw_health_bar_opponent(screen, x, y, width, height, health):
     draw_health_bar(screen, x, y, width, height, health)
-    #Draw the name
+    # Draw the name
     name_text = font.render("Opponent", True, black)
-    screen.blit(name_text, (x, y+height+5))
+    screen.blit(name_text, (x, y + height + 5))
 
+# --- Network Functions ---
 def receive_game_state():
-    global player1_health, player2_health, turn, harden_active, empower_active
+    global game
     while True:
         try:
             data = client_socket.recv(1024).decode()
             if not data:
                 break
             game_state = json.loads(data)
-            player1_health = game_state['player1_health']
-            player2_health = game_state['player2_health']
-            turn = game_state['turn']
-            harden_active = game_state['harden_active']
-            empower_active = game_state['empower_active']
+            game.health = game_state['player1_health']
+            game.health2 = game_state['player2_health']
+            game.turn = game_state['turn']
+            game.harden_active = game_state['harden_active']
+            game.empower_active = game_state['empower_active']
+        except (socket.error, ConnectionResetError) as e:
+            print(f"Connection error: {e}")
+            # Add reconnect logic here if desired
+            break
+        except json.JSONDecodeError as e:
+            print(f"Error decoding JSON: {e}")
         except Exception as e:
             print(f"Error receiving game state: {e}")
             break
@@ -298,14 +313,14 @@ while running:
     if current_state == GameState.MENU:
         for button in menu_buttons:
             button.draw(screen)
-        #removed draw_health_bar here.
+        # removed draw_health_bar here.
     elif current_state == GameState.CREDITS:
         draw_credits(screen)
     elif current_state == GameState.GAME_MENU:
         game_buttons = draw_game_menu(screen)
-        draw_health_bar_jimmy(screen, 20, 100, 200, 20, player1_health)  # added to draw the healthbar
-        draw_health_bar_opponent(screen, screen_width-220, 100, 200, 20, player2_health) #draw the second health bar
-        draw_turn(screen, turn)
+        draw_health_bar_jimmy(screen, 20, 100, 200, 20, game.health)  # Use game.health
+        draw_health_bar_opponent(screen, screen_width - 220, 100, 200, 20, game.health2)  # Use game.health2
+        draw_turn(screen, game.turn)
     # Update the display
     pygame.display.flip()
 

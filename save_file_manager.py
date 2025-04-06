@@ -4,15 +4,23 @@ import csv
 class SaveFileManager:
     def __init__(self, save_directory="saves"):
         self.save_directory = save_directory
-        if not os.path.exists(self.save_directory):
-            os.makedirs(self.save_directory)
+        try:
+            if not os.path.exists(self.save_directory):
+                os.makedirs(self.save_directory)
+        except OSError as e:
+            print(f"Error creating save directory: {e}")
 
     def get_save_files(self):
         """Returns a list of available save files (CSV files) in the save directory."""
         save_files = []
-        for filename in os.listdir(self.save_directory):
-            if filename.endswith(".csv"):
-                save_files.append(filename)
+        try:
+            for filename in os.listdir(self.save_directory):
+                if filename.endswith(".csv"):
+                    save_files.append(filename)
+        except FileNotFoundError:
+            print(f"Save directory not found: {self.save_directory}")
+        except OSError as e:
+            print(f"Error accessing save directory: {e}")
         return save_files
 
     def load_save_file(self, filename):
@@ -27,8 +35,14 @@ class SaveFileManager:
                 reader = csv.DictReader(file)
                 data = [row for row in reader]
                 return data
+        except FileNotFoundError:
+            print(f"Error: Save file '{filename}' not found.")
+            return None
+        except csv.Error as e:
+            print(f"Error reading CSV file '{filename}': {e}")
+            return None
         except Exception as e:
-            print(f"Error loading save file: {e}")
+            print(f"Error loading save file '{filename}': {e}")
             return None
 
     def save_data(self, filename, data):
@@ -43,32 +57,12 @@ class SaveFileManager:
                 else:
                     writer = csv.writer(file)
                     writer.writerows(data)
+        except TypeError as e:
+            print(f"Error: Data is not in the correct format: {e}")
+        except csv.Error as e:
+            print(f"Error writing to CSV file '{filename}': {e}")
         except Exception as e:
-            print(f"Error saving data: {e}")
-
-    # def choose_save_file(self):
-    #     """Allows the user to choose a save file from the console."""
-    #     save_files = self.get_save_files()
-
-    #     if not save_files:
-    #         new_data = [{"name": "Player 1", "score": 100}, {"name": "Player 2", "score": 150}]
-    #         print("No save files found.")
-    #         name = input("Name for new save:")
-    #         self.save_data(f"{name}.csv", new_data)
-    #         return self.get_save_files()[0]
-    #     else:
-    #         print("Available save files:")
-    #         for i, filename in enumerate(save_files):
-    #             print(f"{i + 1}. {filename}")
-    #         while True:
-    #             try:
-    #                 choice = int(input("Enter the number of the save file to load: "))
-    #                 if 1 <= choice <= len(save_files):
-    #                     return save_files[choice - 1]
-    #                 else:
-    #                     print("Invalid choice. Please enter a number from the list.")
-    #             except ValueError:
-    #                 print("Invalid input. Please enter a number.")
+            print(f"Error saving data to '{filename}': {e}")
 
 # SAVING LOGIC
 # --- Save File Manager ---
@@ -79,16 +73,16 @@ def selectSave(filename):
         print("Invalid filename")
         return -1
     data = save_manager.load_save_file(filename)
-    print(f"You selected: {filename}\nWhich has the data: {data}")
-    # if data:
-    #     print("Loaded data:")
-    #     for row in data:
-    #         print(row)
-    # else:
-    #     print("Failed to load data.")
+    if data is not None:
+        print(f"You selected: {filename}\nWhich has the data: {data}")
+    else:
+        print(f"Failed to load data from {filename}")
 
 def create_new_save():
     new_data = [{"name": "Player 1", "score": 100}, {"name": "Player 2", "score": 150}]
-    name = input("Name for new save:")
-    save_manager.save_data(f"{name}.csv", new_data)
-    print(f"Created new save file: {name}.csv")
+    try:
+        name = input("Name for new save:")
+        save_manager.save_data(f"{name}.csv", new_data)
+        print(f"Created new save file: {name}.csv")
+    except Exception as e:
+        print(f"Error creating new save: {e}")
