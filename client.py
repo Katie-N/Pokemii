@@ -77,7 +77,7 @@ harden_active = False
 empower_active = False
 
 # --- Network Variables ---
-HOST = '127.0.0.1'  # Server IP address
+HOST = '192.168.12.112'  # Server IP address
 PORT = 5555
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((HOST, PORT))

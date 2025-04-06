@@ -67,3 +67,5 @@ SAVE_MENU_BUTTON_SPACING = 70 # New constant for save menu button spacing
 
 font = pygame.font.Font(None, FONT_SIZE)
 large_font = pygame.font.Font(None, LARGE_FONT_SIZE)
+
+saveData = {}

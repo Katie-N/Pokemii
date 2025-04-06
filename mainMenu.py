@@ -5,6 +5,7 @@ import pygame
 import os
 import save_file_manager
 from cursor import specialCursor
+import saveMenu  # Import the saveMenu module
 # from runGame import run_game
 from train import beginTraining
 from compete import beginCompeting
@@ -75,8 +76,10 @@ def handle_events(
     back_button,
     second_menu_visible,
     save_button,
-    save_menu_buttons,
-    save_menu_visible
+    save_menu_visible,
+    close_button_rect,
+    images,
+    title_font
 ):
     """Handles events in the main menu."""
     for event in pygame.event.get():
@@ -114,12 +117,8 @@ def handle_events(
                     return False, True, False, save_menu_visible
             if save_button[0].collidepoint(mouse_pos):
                 print("Save button clicked!")
-                return False, False, second_menu_visible, True
-            if save_menu_visible:
-                for button in save_menu_buttons:
-                    if button[0].collidepoint(mouse_pos):
-                        if button[1]:
-                            button[1]()
+                saveMenu.save_menu(globalSettings.screen, images, title_font, close_button_rect)  # Call saveMenu
+                return False, False, second_menu_visible, False
     return False, False, second_menu_visible, save_menu_visible
 
 def main_menu():
@@ -171,11 +170,9 @@ def main_menu():
         None,
         image=images["save_button"]
     )
-    save_menu_buttons = []
-    for file in save_file_manager.save_manager.get_save_files():
-        # file=file is needed so the latest value of file is NOT what is stored for every save file button
-        save_menu_buttons.append((pygame.Rect(0,0,0,0), lambda file=file: save_file_manager.selectSave(file), file))
-    save_menu_buttons.append((pygame.Rect(0,0,0,0), save_file_manager.create_new_save, "New Save"))
+
+    # Create the close button for the save menu
+    close_button_rect = pygame.Rect(50, 50, 100, 50)  # Example position and size
 
     # This infinite loop drives the code. It is the main scheduler and handles all the logic
     running = True
@@ -184,7 +181,20 @@ def main_menu():
         importMii_button, tradeMii_button, next_button = draw.draw_main_menu(globalSettings.screen, images, menu_offset, title_font, button_positions)
         train_button, compete_button, back_button = draw.draw_second_menu(globalSettings.screen, images, menu_offset, title_font, button_positions)
         
-        quit_game, back_to_main, second_menu_visible, save_menu_visible = handle_events(train_button, compete_button, next_button, importMii_button, tradeMii_button, back_button, second_menu_visible, save_button, save_menu_buttons, save_menu_visible)
+        quit_game, back_to_main, second_menu_visible, save_menu_visible = handle_events(
+            train_button,
+            compete_button,
+            next_button,
+            importMii_button,
+            tradeMii_button,
+            back_button,
+            second_menu_visible,
+            save_button,
+            save_menu_visible,
+            close_button_rect,
+            images,
+            title_font
+        )
         if quit_game:
             running = False
         if back_to_main:
@@ -210,9 +220,6 @@ def main_menu():
         save_button[0].height = globalSettings.SAVE_BUTTON_SIZE
         save_button[0].topleft = (pick_save_x, pick_save_y)
         globalSettings.screen.blit(images["save_button"], (pick_save_x, pick_save_y))
-
-        if save_menu_visible:
-            draw.draw_save_menu(globalSettings.screen, save_menu_buttons)
 
         specialCursor(globalSettings.screen, images["cursor.png"])
 
