@@ -8,6 +8,8 @@ from cursor import specialCursor
 # from runGame import run_game
 from train import beginTraining
 from compete import beginCompeting
+from importMii import importMiis
+from tradeMii import tradeMiis
 
 # Initialize Pygame
 pygame.init()
@@ -87,10 +89,12 @@ def handle_events(
                     print("Import Mii button clicked!")
                     if importMii_button[1]:
                         importMii_button[1]()
+                        importMiis()
                 if tradeMii_button[0].collidepoint(mouse_pos):
                     print("Trade Mii button clicked!")
                     if tradeMii_button[1]:
                         tradeMii_button[1]()
+                        tradeMiis()
                     return True, False, second_menu_visible, save_menu_visible
                 if next_button[0].collidepoint(mouse_pos):
                     return False, False, True, save_menu_visible
