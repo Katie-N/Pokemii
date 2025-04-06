@@ -217,7 +217,7 @@ def draw_save_menu(screen, save_menu_buttons):
     for button in save_menu_buttons:
         # Calculate the button's position
         button_x = globalSettings.SCREEN_WIDTH // 2 - globalSettings.SAVE_MENU_BUTTON_WIDTH // 2
-        button_y = globalSettings.SCREEN_HEIGHT // 2 - (len(save_menu_buttons) * globalSettings.SAVE_MENU_BUTTON_SPACING) // 2 + (save_menu_buttons.index(button) * SAVE_MENU_BUTTON_SPACING)
+        button_y = globalSettings.SCREEN_HEIGHT // 2 - (len(save_menu_buttons) * globalSettings.SAVE_MENU_BUTTON_SPACING) // 2 + (save_menu_buttons.index(button) * globalSettings.SAVE_MENU_BUTTON_SPACING)
         
         # Update the button's rectangle
         button[0].x = button_x

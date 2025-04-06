@@ -5,6 +5,7 @@ import pygame
 import os
 import save_file_manager
 from cursor import specialCursor
+from runGame import run_game
 
 # Initialize Pygame
 pygame.init()
@@ -98,6 +99,7 @@ def handle_events(
                     print("Compete button clicked!")
                     if compete_button[1]:
                         compete_button[1]()
+                        run_game()
                         
                 if back_button[0].collidepoint(mouse_pos):
                     return False, True, False, save_menu_visible
