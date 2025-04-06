@@ -1,67 +1,14 @@
+import globalSettings
+import buttonsFromRect
+import draw
 import pygame
 import os
-from save_file_manager import SaveFileManager
+import save_file_manager
 from cursor import specialCursor
+from runGame import run_game
 
 # Initialize Pygame
 pygame.init()
-
-# --- Constants ---
-# Colors
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-BLUE = (0, 0, 255)
-
-# Screen dimensions
-infoObject = pygame.display.Info()
-MAX_WIDTH = infoObject.current_w
-MAX_HEIGHT = infoObject.current_h
-
-if MAX_WIDTH / MAX_HEIGHT >= 16 / 9:
-    SCREEN_HEIGHT = MAX_HEIGHT
-    SCREEN_WIDTH = int(SCREEN_HEIGHT * 16 / 9)
-else:
-    SCREEN_WIDTH = MAX_WIDTH
-    SCREEN_HEIGHT = int(SCREEN_WIDTH * 9 / 16)
-
-SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
-
-# Button dimensions
-MAIN_BUTTON_WIDTH = int(SCREEN_WIDTH * 0.286458)
-MAIN_BUTTON_HEIGHT = int(SCREEN_HEIGHT * 0.1398148)
-NAV_BUTTON_WIDTH = int(SCREEN_WIDTH * 0.0322916)
-NAV_BUTTON_HEIGHT = int(SCREEN_HEIGHT * 0.084259)
-BUTTON_TEXT_COLOR = WHITE
-
-# --- New Global Variable ---
-SAVE_BUTTON_SIZE = 100  # Set the desired size here
-SAVE_MENU_BUTTON_WIDTH = 300 # New constant for save menu button width
-SAVE_MENU_BUTTON_HEIGHT = 60 # New constant for save menu button height
-SAVE_MENU_BUTTON_SPACING = 70 # New constant for save menu button spacing
-
-# --- Functions ---
-def draw_text(text, font, color, surface, x, y):
-    """Draws text on the screen."""
-    textobj = font.render(text, True, color)
-    textrect = textobj.get_rect()
-    textrect.topleft = (x, y)
-    surface.blit(textobj, textrect)
-
-def create_button(text, x, y, width, height, text_color, surface, action=None, image=None):
-    """Creates a button, optionally with an image, and returns its rectangle."""
-    button_rect = pygame.Rect(x, y, width, height)
-    # Create a transparent surface for the button
-    button_surface = pygame.Surface((width, height), pygame.SRCALPHA)
-    # Draw a semi-transparent rectangle (optional, for a subtle button effect)
-    pygame.draw.rect(button_surface, (0, 0, 0, 0), (0, 0, width, height))  # Last value is alpha (0-255)
-
-    if image:
-        button_surface.blit(image, (0, 0))
-
-    surface.blit(button_surface, (x,y))
-    font = pygame.font.Font(None, 36)
-    draw_text(text, font, text_color, surface, x + 10, y + 10)
-    return button_rect, action
 
 def load_images(assets_path):
     """Loads and scales background images."""
@@ -74,19 +21,19 @@ def load_images(assets_path):
 
         if os.path.exists(pic1_path):
             images["mii_channel"] = pygame.image.load(pic1_path).convert()
-            images["mii_channel"] = pygame.transform.scale(images["mii_channel"], SCREEN_SIZE)
+            images["mii_channel"] = pygame.transform.scale(images["mii_channel"], globalSettings.SCREEN_SIZE)
         else:
             raise FileNotFoundError(f"Image file not found: {pic1_path}")
 
         if os.path.exists(pic2_path):
             images["fight_menu"] = pygame.image.load(pic2_path).convert()
-            images["fight_menu"] = pygame.transform.scale(images["fight_menu"], SCREEN_SIZE)
+            images["fight_menu"] = pygame.transform.scale(images["fight_menu"], globalSettings.SCREEN_SIZE)
         else:
             raise FileNotFoundError(f"Image file not found: {pic2_path}")
         
         if os.path.exists(save_image_path):
             images["save_button"] = pygame.image.load(save_image_path).convert_alpha()
-            images["save_button"] = pygame.transform.scale(images["save_button"], (SAVE_BUTTON_SIZE, SAVE_BUTTON_SIZE))
+            images["save_button"] = pygame.transform.scale(images["save_button"], (globalSettings.SAVE_BUTTON_SIZE, globalSettings.SAVE_BUTTON_SIZE))
         else:
             raise FileNotFoundError(f"Image file not found: {save_image_path}")
         if os.path.exists(cursor_image_path):
@@ -101,34 +48,12 @@ def load_images(assets_path):
         print(f"Error loading image: {e}")
         return {}
 
-def calculate_button_positions():
-    """Calculates button positions relative to the screen."""
-    button_y = int(SCREEN_HEIGHT * 0.77222)
-    left_button_x = int(SCREEN_WIDTH * 0.1916)
-    right_button_x = int(SCREEN_WIDTH * 0.52083)
-    next_button_x = int(SCREEN_WIDTH * 0.9333)
-    next_button_y = int(SCREEN_HEIGHT * 0.347222)
-    back_button_x = int(SCREEN_WIDTH * 0.033333)
-    pick_save_x = 10
-    pick_save_y = 10
-
-    return (
-        button_y,
-        left_button_x,
-        right_button_x,
-        next_button_x,
-        next_button_y,
-        back_button_x,
-        pick_save_x,
-        pick_save_y,
-    )
-
 def handle_menu_sliding(second_menu_visible, menu_offset, menu_slide_speed):
     """Handles the menu sliding logic."""
     if second_menu_visible:
         menu_offset -= menu_slide_speed
-        if menu_offset <= -SCREEN_WIDTH:
-            menu_offset = -SCREEN_WIDTH
+        if menu_offset <= -globalSettings.SCREEN_WIDTH:
+            menu_offset = -globalSettings.SCREEN_WIDTH
     else:
         menu_offset += menu_slide_speed
         if menu_offset >= 0:
@@ -174,6 +99,7 @@ def handle_events(
                     print("Compete button clicked!")
                     if compete_button[1]:
                         compete_button[1]()
+                        run_game()
                         
                 if back_button[0].collidepoint(mouse_pos):
                     return False, True, False, save_menu_visible
@@ -187,166 +113,9 @@ def handle_events(
                             button[1]()
     return False, False, second_menu_visible, save_menu_visible
 
-# DRAW MII CHANNEL MENU
-
-def draw_main_menu(screen, images, menu_offset, title_font, button_positions):
-    """Draws the main menu."""
-    first_menu_surface = pygame.Surface(SCREEN_SIZE, pygame.SRCALPHA)
-    first_menu_surface.blit(images["mii_channel"], (0, 0))
-    (
-        button_y,
-        left_button_x,
-        right_button_x,
-        next_button_x,
-        next_button_y,
-        back_button_x,
-        pick_save_x,
-        pick_save_y,
-    ) = button_positions
-
-    def import_mii_action():
-        print("Importing Mii...")
-
-    def trade_mii_action():
-        print("Trading Mii...")
-
-    importMii_button = create_button(
-        "",
-        left_button_x,
-        button_y,
-        MAIN_BUTTON_WIDTH,
-        MAIN_BUTTON_HEIGHT,
-        BUTTON_TEXT_COLOR,
-        first_menu_surface,
-        import_mii_action
-    )
-    tradeMii_button = create_button(
-        "",
-        right_button_x,
-        button_y,
-        MAIN_BUTTON_WIDTH,
-        MAIN_BUTTON_HEIGHT,
-        BUTTON_TEXT_COLOR,
-        first_menu_surface,
-        trade_mii_action
-    )
-    next_button = create_button(
-        "",
-        next_button_x,
-        next_button_y,
-        NAV_BUTTON_WIDTH,
-        NAV_BUTTON_HEIGHT,
-        BUTTON_TEXT_COLOR,
-        first_menu_surface,
-    )
-
-    screen.blit(first_menu_surface, (menu_offset, 0))
-    return importMii_button, tradeMii_button, next_button
-
-# DRAW TRAINING MENU
-
-def draw_second_menu(screen, images, menu_offset, title_font, button_positions):
-    """Draws the second menu."""
-    second_menu_surface = pygame.Surface(SCREEN_SIZE, pygame.SRCALPHA)
-    second_menu_surface.blit(images["fight_menu"], (0, 0))
-    (   button_y,
-        left_button_x,
-        right_button_x,
-        next_button_x,
-        next_button_y,
-        back_button_x,
-        pick_save_x,
-        pick_save_y,
-    ) = button_positions
-
-    def train_action():
-        print("Training...")
-
-    def compete_action():
-        print("Competing...")
-
-    train_button = create_button(
-        "",
-        left_button_x,
-        button_y,
-        MAIN_BUTTON_WIDTH,
-        MAIN_BUTTON_HEIGHT,
-        BUTTON_TEXT_COLOR,
-        second_menu_surface,
-        train_action
-    )
-    compete_button = create_button(
-        "",
-        right_button_x,
-        button_y,
-        MAIN_BUTTON_WIDTH,
-        MAIN_BUTTON_HEIGHT,
-        BUTTON_TEXT_COLOR,
-        second_menu_surface,
-        compete_action
-    )
-    back_button = create_button(
-        "",
-        back_button_x,
-        next_button_y,
-        NAV_BUTTON_WIDTH,
-        NAV_BUTTON_HEIGHT,
-        BUTTON_TEXT_COLOR,
-        second_menu_surface,
-    )
-
-    screen.blit(second_menu_surface, (menu_offset + SCREEN_WIDTH, 0))
-    return train_button, compete_button, back_button
-
-def draw_save_menu(screen, save_menu_buttons):
-    """Draws the save options menu."""
-    save_menu_surface = pygame.Surface(SCREEN_SIZE, pygame.SRCALPHA)
-    save_menu_surface.fill((100,100,100, 150))
-    for button in save_menu_buttons:
-        # Calculate the button's position
-        button_x = SCREEN_WIDTH // 2 - SAVE_MENU_BUTTON_WIDTH // 2
-        button_y = SCREEN_HEIGHT // 2 - (len(save_menu_buttons) * SAVE_MENU_BUTTON_SPACING) // 2 + (save_menu_buttons.index(button) * SAVE_MENU_BUTTON_SPACING)
-        
-        # Update the button's rectangle
-        button[0].x = button_x
-        button[0].y = button_y
-        button[0].width = SAVE_MENU_BUTTON_WIDTH
-        button[0].height = SAVE_MENU_BUTTON_HEIGHT
-        button[0].topleft = (button_x, button_y)
-        
-        # Draw the button
-        pygame.draw.rect(save_menu_surface, (200,200,200), button[0])
-        
-        # Draw the text
-        draw_text(button[2], pygame.font.Font(None, 36), BLACK, save_menu_surface, button_x + 10, button_y + 10)
-    screen.blit(save_menu_surface, (0,0))
-
-# SAVING LOGIC
-# --- Save File Manager ---
-save_manager = SaveFileManager()
-
-def selectSave(filename):
-    if not filename or (filename not in save_manager.get_save_files()):
-        print("Invalid filename")
-        return -1
-    data = save_manager.load_save_file(filename)
-    print(f"You selected: {filename}\nWhich has the data: {data}")
-    # if data:
-    #     print("Loaded data:")
-    #     for row in data:
-    #         print(row)
-    # else:
-    #     print("Failed to load data.")
-
-def create_new_save():
-    new_data = [{"name": "Player 1", "score": 100}, {"name": "Player 2", "score": 150}]
-    name = input("Name for new save:")
-    save_manager.save_data(f"{name}.csv", new_data)
-    print(f"Created new save file: {name}.csv")
-
 def main_menu():
     """Displays the main menu."""
-    screen = pygame.display.set_mode(SCREEN_SIZE)
+    screen = pygame.display.set_mode(globalSettings.SCREEN_SIZE)
     pygame.display.set_caption("Main Menu")
 
     # Load images
@@ -359,7 +128,7 @@ def main_menu():
     title_font = pygame.font.Font(None, 64)
 
     # Calculate button positions
-    button_positions = calculate_button_positions()
+    button_positions = buttonsFromRect.calculate_button_positions()
     (
         button_y,
         left_button_x,
@@ -382,29 +151,29 @@ def main_menu():
     FPS = 60  # Set the desired frame rate
 
     # --- Create the save button ---
-    save_button = create_button(
+    save_button = buttonsFromRect.create_button(
         "Pick Save",
         pick_save_x,
         pick_save_y,
-        SAVE_BUTTON_SIZE,
-        SAVE_BUTTON_SIZE,
-        BLACK,
+        globalSettings.SAVE_BUTTON_SIZE,
+        globalSettings.SAVE_BUTTON_SIZE,
+        globalSettings.BLACK,
         screen,
         None,
         image=images["save_button"]
     )
     save_menu_buttons = []
-    for file in save_manager.get_save_files():
+    for file in save_file_manager.save_manager.get_save_files():
         # file=file is needed so the latest value of file is NOT what is stored for every save file button
-        save_menu_buttons.append((pygame.Rect(0,0,0,0), lambda file=file: selectSave(file), file))
-    save_menu_buttons.append((pygame.Rect(0,0,0,0), create_new_save, "New Save"))
+        save_menu_buttons.append((pygame.Rect(0,0,0,0), lambda file=file: save_file_manager.selectSave(file), file))
+    save_menu_buttons.append((pygame.Rect(0,0,0,0), save_file_manager.create_new_save, "New Save"))
 
     # This infinite loop drives the code. It is the main scheduler and handles all the logic
     running = True
     while running:
         # EVENT HANDLING
-        importMii_button, tradeMii_button, next_button = draw_main_menu(screen, images, menu_offset, title_font, button_positions)
-        train_button, compete_button, back_button = draw_second_menu(screen, images, menu_offset, title_font, button_positions)
+        importMii_button, tradeMii_button, next_button = draw.draw_main_menu(screen, images, menu_offset, title_font, button_positions)
+        train_button, compete_button, back_button = draw.draw_second_menu(screen, images, menu_offset, title_font, button_positions)
         
         quit_game, back_to_main, second_menu_visible, save_menu_visible = handle_events(train_button, compete_button, next_button, importMii_button, tradeMii_button, back_button, second_menu_visible, save_button, save_menu_buttons, save_menu_visible)
         if quit_game:
@@ -416,25 +185,25 @@ def main_menu():
         # --- Menu Sliding Logic ---
         menu_offset = handle_menu_sliding(second_menu_visible, menu_offset, menu_slide_speed)
 
-        screen.fill(BLACK)
+        screen.fill(globalSettings.BLACK)
 
         # Draw Main Menu
-        importMii_button, tradeMii_button, next_button = draw_main_menu(screen, images, menu_offset, title_font, button_positions)
+        importMii_button, tradeMii_button, next_button = draw.draw_main_menu(screen, images, menu_offset, title_font, button_positions)
 
         # Draw Second Menu
-        if second_menu_visible or menu_offset > -SCREEN_WIDTH:
-            train_button, compete_button, back_button = draw_second_menu(screen, images, menu_offset, title_font, button_positions)
+        if second_menu_visible or menu_offset > -globalSettings.SCREEN_WIDTH:
+            train_button, compete_button, back_button = draw.draw_second_menu(screen, images, menu_offset, title_font, button_positions)
         
         # Draw the save button
         save_button[0].x = pick_save_x
         save_button[0].y = pick_save_y
-        save_button[0].width = SAVE_BUTTON_SIZE
-        save_button[0].height = SAVE_BUTTON_SIZE
+        save_button[0].width = globalSettings.SAVE_BUTTON_SIZE
+        save_button[0].height = globalSettings.SAVE_BUTTON_SIZE
         save_button[0].topleft = (pick_save_x, pick_save_y)
         screen.blit(images["save_button"], (pick_save_x, pick_save_y))
 
         if save_menu_visible:
-            draw_save_menu(screen, save_menu_buttons)
+            draw.draw_save_menu(screen, save_menu_buttons)
 
         specialCursor(screen, images["cursor.png"])
 

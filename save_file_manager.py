@@ -69,3 +69,26 @@ class SaveFileManager:
     #                     print("Invalid choice. Please enter a number from the list.")
     #             except ValueError:
     #                 print("Invalid input. Please enter a number.")
+
+# SAVING LOGIC
+# --- Save File Manager ---
+save_manager = SaveFileManager()
+
+def selectSave(filename):
+    if not filename or (filename not in save_manager.get_save_files()):
+        print("Invalid filename")
+        return -1
+    data = save_manager.load_save_file(filename)
+    print(f"You selected: {filename}\nWhich has the data: {data}")
+    # if data:
+    #     print("Loaded data:")
+    #     for row in data:
+    #         print(row)
+    # else:
+    #     print("Failed to load data.")
+
+def create_new_save():
+    new_data = [{"name": "Player 1", "score": 100}, {"name": "Player 2", "score": 150}]
+    name = input("Name for new save:")
+    save_manager.save_data(f"{name}.csv", new_data)
+    print(f"Created new save file: {name}.csv")
