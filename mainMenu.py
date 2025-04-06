@@ -115,7 +115,8 @@ def handle_events(
 
 def main_menu():
     """Displays the main menu."""
-    screen = pygame.display.set_mode(globalSettings.SCREEN_SIZE)
+    globalSettings.screen = pygame.display.set_mode(globalSettings.SCREEN_SIZE)
+
     pygame.display.set_caption("Main Menu")
 
     # Load images
@@ -158,7 +159,7 @@ def main_menu():
         globalSettings.SAVE_BUTTON_SIZE,
         globalSettings.SAVE_BUTTON_SIZE,
         globalSettings.BLACK,
-        screen,
+        globalSettings.screen,
         None,
         image=images["save_button"]
     )
@@ -172,8 +173,8 @@ def main_menu():
     running = True
     while running:
         # EVENT HANDLING
-        importMii_button, tradeMii_button, next_button = draw.draw_main_menu(screen, images, menu_offset, title_font, button_positions)
-        train_button, compete_button, back_button = draw.draw_second_menu(screen, images, menu_offset, title_font, button_positions)
+        importMii_button, tradeMii_button, next_button = draw.draw_main_menu(globalSettings.screen, images, menu_offset, title_font, button_positions)
+        train_button, compete_button, back_button = draw.draw_second_menu(globalSettings.screen, images, menu_offset, title_font, button_positions)
         
         quit_game, back_to_main, second_menu_visible, save_menu_visible = handle_events(train_button, compete_button, next_button, importMii_button, tradeMii_button, back_button, second_menu_visible, save_button, save_menu_buttons, save_menu_visible)
         if quit_game:
@@ -185,14 +186,14 @@ def main_menu():
         # --- Menu Sliding Logic ---
         menu_offset = handle_menu_sliding(second_menu_visible, menu_offset, menu_slide_speed)
 
-        screen.fill(globalSettings.BLACK)
+        globalSettings.screen.fill(globalSettings.BLACK)
 
         # Draw Main Menu
-        importMii_button, tradeMii_button, next_button = draw.draw_main_menu(screen, images, menu_offset, title_font, button_positions)
+        importMii_button, tradeMii_button, next_button = draw.draw_main_menu(globalSettings.screen, images, menu_offset, title_font, button_positions)
 
         # Draw Second Menu
         if second_menu_visible or menu_offset > -globalSettings.SCREEN_WIDTH:
-            train_button, compete_button, back_button = draw.draw_second_menu(screen, images, menu_offset, title_font, button_positions)
+            train_button, compete_button, back_button = draw.draw_second_menu(globalSettings.screen, images, menu_offset, title_font, button_positions)
         
         # Draw the save button
         save_button[0].x = pick_save_x
@@ -200,12 +201,12 @@ def main_menu():
         save_button[0].width = globalSettings.SAVE_BUTTON_SIZE
         save_button[0].height = globalSettings.SAVE_BUTTON_SIZE
         save_button[0].topleft = (pick_save_x, pick_save_y)
-        screen.blit(images["save_button"], (pick_save_x, pick_save_y))
+        globalSettings.screen.blit(images["save_button"], (pick_save_x, pick_save_y))
 
         if save_menu_visible:
-            draw.draw_save_menu(screen, save_menu_buttons)
+            draw.draw_save_menu(globalSettings.screen, save_menu_buttons)
 
-        specialCursor(screen, images["cursor.png"])
+        specialCursor(globalSettings.screen, images["cursor.png"])
 
         pygame.display.flip()
         clock.tick(FPS)

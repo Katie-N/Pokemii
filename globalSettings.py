@@ -33,6 +33,7 @@ LARGE_FONT_SIZE = 72
 # ----------------------------------- #
 # Global Variables for the Game Logic
 currentState = None
+screen = None
 
 # From mainMenu.py
 
@@ -63,3 +64,6 @@ SAVE_BUTTON_SIZE = 100  # Set the desired size here
 SAVE_MENU_BUTTON_WIDTH = 300 # New constant for save menu button width
 SAVE_MENU_BUTTON_HEIGHT = 60 # New constant for save menu button height
 SAVE_MENU_BUTTON_SPACING = 70 # New constant for save menu button spacing
+
+font = pygame.font.Font(None, FONT_SIZE)
+large_font = pygame.font.Font(None, LARGE_FONT_SIZE)
