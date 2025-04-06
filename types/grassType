@@ -1,0 +1,3 @@
+class GrassType(PokemonType):
+    def __init__(self):
+        super().__init__("Grass", ["Fire", "Ice", "Poison", "Bug"], ["Water", "Grass", "Electric"], [], ["green"])

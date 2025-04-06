@@ -1,0 +1,3 @@
+class IceType(PokemonType):
+    def __init__(self):
+        super().__init__("Ice", ["Fire", "Fighting"], ["Ice"], [], ["light blue"])

@@ -1,0 +1,3 @@
+class PoisonType(PokemonType):
+    def __init__(self):
+        super().__init__("Poison", [], ["Grass", "Fighting", "Poison", "Bug", "Fairy"], [], ["purple"])

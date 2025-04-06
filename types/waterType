@@ -1,0 +1,3 @@
+class WaterType(PokemonType):
+    def __init__(self):
+        super().__init__("Water", ["Grass", "Electric"], ["Fire", "Water", "Ice"], [], ["dark blue"])
