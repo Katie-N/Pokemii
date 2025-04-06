@@ -5,10 +5,14 @@ import pygame
 import os
 import save_file_manager
 from cursor import specialCursor
-from runGame import run_game
+# from runGame import run_game
+from train import beginTraining
+from compete import beginCompeting
 
 # Initialize Pygame
 pygame.init()
+# Initalize the screen
+globalSettings.screen = pygame.display.set_mode(globalSettings.SCREEN_SIZE)
 
 def load_images(assets_path):
     """Loads and scales background images."""
@@ -95,11 +99,12 @@ def handle_events(
                     print("Train button clicked!")
                     if train_button[1]:
                         train_button[1]()
+                        beginTraining()
                 if compete_button[0].collidepoint(mouse_pos):
                     print("Compete button clicked!")
                     if compete_button[1]:
                         compete_button[1]()
-                        run_game()
+                        beginCompeting()
                         
                 if back_button[0].collidepoint(mouse_pos):
                     return False, True, False, save_menu_visible
@@ -115,7 +120,6 @@ def handle_events(
 
 def main_menu():
     """Displays the main menu."""
-    globalSettings.screen = pygame.display.set_mode(globalSettings.SCREEN_SIZE)
 
     pygame.display.set_caption("Main Menu")
 
