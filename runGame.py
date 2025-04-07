@@ -3,6 +3,7 @@ import globalSettings
 from game import Game, GameState
 import draw
 import buttons
+from cursor import specialCursor
 
 def run_game():
     """Runs the game logic after menu transition."""
@@ -34,6 +35,8 @@ def run_game():
             draw.draw_turn(globalSettings.screen, game)
         elif globalSettings.current_state == GameState.MENU:
             return
+        specialCursor(globalSettings.screen, globalSettings.images["cursor.png"])
+        
         pygame.display.flip()
         clock.tick(60)
 

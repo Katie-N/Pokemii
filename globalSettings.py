@@ -69,3 +69,4 @@ font = pygame.font.Font(None, FONT_SIZE)
 large_font = pygame.font.Font(None, LARGE_FONT_SIZE)
 
 saveData = {}
+images = []

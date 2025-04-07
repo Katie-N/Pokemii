@@ -2,6 +2,7 @@ import pygame
 import globalSettings
 import save_file_manager
 import draw
+from cursor import specialCursor
 
 def create_save_menu_buttons(images):
     """Creates the save menu buttons."""
@@ -75,9 +76,9 @@ def handle_new_save():
 
         pygame.display.flip()
 
-def save_menu(screen, images, title_font, close_button_rect):
+def save_menu(screen, title_font, close_button_rect):
     """Displays the save menu."""
-    save_menu_buttons = create_save_menu_buttons(images)
+    save_menu_buttons = create_save_menu_buttons(globalSettings.images)
     running = True
     while running:
         screen.fill(globalSettings.BLACK)
@@ -94,6 +95,8 @@ def save_menu(screen, images, title_font, close_button_rect):
             ),
         )
 
+        specialCursor(globalSettings.screen, globalSettings.images["cursor.png"])
+
         pygame.display.flip()
 
         for event in pygame.event.get():
@@ -106,3 +109,5 @@ def save_menu(screen, images, title_font, close_button_rect):
                 for button in save_menu_buttons:
                     if button[0].collidepoint(mouse_pos) and button[1]:
                         button[1]()
+                        # Regenerate the save menu buttons after a save is selected just in case it was a new save
+                        save_menu_buttons = create_save_menu_buttons(images)

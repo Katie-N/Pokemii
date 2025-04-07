@@ -117,7 +117,7 @@ def handle_events(
                     return False, True, False, save_menu_visible
             if save_button[0].collidepoint(mouse_pos):
                 print("Save button clicked!")
-                saveMenu.save_menu(globalSettings.screen, images, title_font, close_button_rect)  # Call saveMenu
+                saveMenu.save_menu(globalSettings.screen, title_font, close_button_rect)  # Call saveMenu
                 return False, False, second_menu_visible, False
     return False, False, second_menu_visible, save_menu_visible
 
@@ -128,8 +128,8 @@ def main_menu():
 
     # Load images
     assets_path = os.path.join(".", "assets", "menus")
-    images = load_images(assets_path)
-    if not images:
+    globalSettings.images = load_images(assets_path)
+    if not globalSettings.images:
         return
 
     # Font for the title
@@ -168,7 +168,7 @@ def main_menu():
         globalSettings.BLACK,
         globalSettings.screen,
         None,
-        image=images["save_button"]
+        image=globalSettings.images["save_button"]
     )
 
     # Create the close button for the save menu
@@ -178,8 +178,8 @@ def main_menu():
     running = True
     while running:
         # EVENT HANDLING
-        importMii_button, tradeMii_button, next_button = draw.draw_main_menu(globalSettings.screen, images, menu_offset, title_font, button_positions)
-        train_button, compete_button, back_button = draw.draw_second_menu(globalSettings.screen, images, menu_offset, title_font, button_positions)
+        importMii_button, tradeMii_button, next_button = draw.draw_main_menu(globalSettings.screen, globalSettings.images, menu_offset, title_font, button_positions)
+        train_button, compete_button, back_button = draw.draw_second_menu(globalSettings.screen, globalSettings.images, menu_offset, title_font, button_positions)
         
         quit_game, back_to_main, second_menu_visible, save_menu_visible = handle_events(
             train_button,
@@ -192,7 +192,7 @@ def main_menu():
             save_button,
             save_menu_visible,
             close_button_rect,
-            images,
+            globalSettings.images,
             title_font
         )
         if quit_game:
@@ -207,11 +207,11 @@ def main_menu():
         globalSettings.screen.fill(globalSettings.BLACK)
 
         # Draw Main Menu
-        importMii_button, tradeMii_button, next_button = draw.draw_main_menu(globalSettings.screen, images, menu_offset, title_font, button_positions)
+        importMii_button, tradeMii_button, next_button = draw.draw_main_menu(globalSettings.screen, globalSettings.images, menu_offset, title_font, button_positions)
 
         # Draw Second Menu
         if second_menu_visible or menu_offset > -globalSettings.SCREEN_WIDTH:
-            train_button, compete_button, back_button = draw.draw_second_menu(globalSettings.screen, images, menu_offset, title_font, button_positions)
+            train_button, compete_button, back_button = draw.draw_second_menu(globalSettings.screen, globalSettings.images, menu_offset, title_font, button_positions)
         
         # Draw the save button
         save_button[0].x = pick_save_x
@@ -219,9 +219,9 @@ def main_menu():
         save_button[0].width = globalSettings.SAVE_BUTTON_SIZE
         save_button[0].height = globalSettings.SAVE_BUTTON_SIZE
         save_button[0].topleft = (pick_save_x, pick_save_y)
-        globalSettings.screen.blit(images["save_button"], (pick_save_x, pick_save_y))
+        globalSettings.screen.blit(globalSettings.images["save_button"], (pick_save_x, pick_save_y))
 
-        specialCursor(globalSettings.screen, images["cursor.png"])
+        specialCursor(globalSettings.screen, globalSettings.images["cursor.png"])
 
         pygame.display.flip()
         clock.tick(FPS)
