@@ -1,0 +1,14 @@
+File: cursor.py Summary
+
+**Functions:**
+
+1.  **Name:** `specialCursor`
+    *   **Parameters:**
+        *   `screen` (pygame.Surface): The Pygame surface onto which the custom cursor should be drawn (typically the main display surface).
+        *   `cursorImage` (pygame.Surface): The Pygame surface (image) to use as the custom cursor.
+    *   **Description:** Hides the default system mouse cursor using `pygame.mouse.set_visible(False)`. It then gets the rectangle of the provided `cursorImage`, centers this rectangle at the current mouse position (`pygame.mouse.get_pos()`), and draws (blits) the `cursorImage` onto the specified `screen` surface at that position. This function needs to be called repeatedly within the main game loop to continuously update and display the custom cursor at the mouse's location.
+
+**Variables:**
+
+*   **None defined at the global scope within this file.**
+    *   **Note:** This file imports the `pygame` module but does not define any of its own global variables. The variable `cursor_img_rect` defined within the `specialCursor` function is local to that function.

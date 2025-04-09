@@ -1,6 +1,11 @@
 import pygame
 import os
 import mainMenu
+import buttonsFromRect
+import draw
+import globalSettings
+import cursor
+import buttons
 
 # Initialize Pygame
 pygame.init()
@@ -26,12 +31,6 @@ else:
 SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
 
 # --- Functions ---
-def draw_text(text, font, color, surface, x, y):
-    """Draws text on the screen."""
-    textobj = font.render(text, True, color)
-    textrect = textobj.get_rect()
-    textrect.topleft = (x, y)
-    surface.blit(textobj, textrect)
 
 def main():
     """Main game loop."""

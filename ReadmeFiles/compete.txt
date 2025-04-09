@@ -1,0 +1,12 @@
+File: compete.py Summary
+
+**Functions:**
+
+1.  **Name:** `beginCompeting`
+    *   **Parameters:** None.
+    *   **Description:** This function serves as an entry point to start the main gameplay loop. It calls the `run_game` function, which is imported from the `runGame` module.
+
+**Variables:**
+
+*   **None defined at the global scope within this file.**
+    *   **Note:** This file imports the `run_game` function from the `runGame` module but does not define any of its own global variables.

@@ -1,0 +1,12 @@
+File: runGame.py Summary
+
+**Functions:**
+
+1.  **Name:** `run_game`
+    *   **Parameters:** None.
+    *   **Description:** This function serves as the main loop for the active gameplay phase, distinct from the main menu. It initializes a `Game` object, creates game-specific menu buttons, sets the initial game state to `GAME_MENU`, and enters a loop. Inside the loop, it handles user input events (like quitting or button clicks), updates the display by drawing game elements (health bars, experience bars, turn indicators, game menu buttons) based on the current state, manages the frame rate, and transitions back to the main menu state (`GameState.MENU`) upon quitting or appropriate state change.
+
+**Variables:**
+
+*   **None defined at the global scope within this file.**
+    *   **Note:** This file imports and utilizes modules like `pygame`, `globalSettings`, `game`, `draw`, and `buttons`. Variables defined *within* the `run_game` function (`game`, `game_menu_buttons`, `clock`, `running`, `event`, `button`) are local to that function and not global variables created by this file itself. The file heavily relies on variables defined externally in the `globalSettings` module (e.g., `globalSettings.current_state`, `globalSettings.screen`, `globalSettings.WHITE`, `globalSettings.SCREEN_WIDTH`) and the `GameState` enum from the `game` module.

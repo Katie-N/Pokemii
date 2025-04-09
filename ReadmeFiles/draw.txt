@@ -1,0 +1,95 @@
+File: draw.py Summary
+
+**Functions:**
+
+1.  **Name:** `draw_turn`
+    *   **Parameters:**
+        *   `screen` (pygame.Surface): The surface to draw on.
+        *   `game` (Game): The game object containing turn information.
+    *   **Description:** Draws the current turn number (e.g., "Turn 1") onto the screen using the font size specified in `globalSettings.TURN_FONT_SIZE`.
+
+2.  **Name:** `draw_health_bar`
+    *   **Parameters:**
+        *   `screen` (pygame.Surface): The surface to draw on.
+        *   `x` (int): The x-coordinate of the health bar's top-left corner.
+        *   `y` (int): The y-coordinate of the health bar's top-left corner.
+        *   `width` (int): The total width of the health bar background.
+        *   `height` (int): The height of the health bar.
+        *   `health` (int): The current health value.
+        *   `max_health` (int): The maximum possible health value.
+        *   `name` (str): The label/name to display below the health bar (e.g., "Jimmy", "Opponent").
+        *   `status_effect` (str, optional): The name of a status effect to display above the bar (e.g., "Harden"). Defaults to `None`.
+    *   **Description:** Draws a health bar consisting of a background rectangle, a filled rectangle representing current health (green), the remaining portion (dark red), and an outline. It also draws the provided `name` below the bar and optionally displays a colored rectangle with the `status_effect` text above it.
+
+3.  **Name:** `draw_experience_bar`
+    *   **Parameters:**
+        *   `screen` (pygame.Surface): The surface to draw on.
+        *   `x` (int): The x-coordinate of the experience bar's top-left corner.
+        *   `y` (int): The y-coordinate of the experience bar's top-left corner.
+        *   `width` (int): The total width of the experience bar background.
+        *   `height` (int): The height of the experience bar.
+        *   `experience` (int): The current experience points.
+        *   `experience_needed` (int): The experience points needed for the next level.
+        *   `level` (int): The current level.
+    *   **Description:** Draws an experience bar with a background, a filled portion representing progress towards the next level (gold), and an outline. It also displays the current `level` text above the bar.
+
+4.  **Name:** `draw_credits`
+    *   **Parameters:**
+        *   `screen` (pygame.Surface): The surface to draw on.
+        *   `font` (pygame.font.Font): The standard font object.
+        *   `large_font` (pygame.font.Font): The large font object for the title.
+        *   `credits_back_button` (Button): The Button object for returning from the credits screen.
+    *   **Description:** Fills the screen with white, draws the "Credits" title using the large font, displays the creator's name using the standard font, and draws the provided back button.
+
+5.  **Name:** `draw_game_menu`
+    *   **Parameters:**
+        *   `screen` (pygame.Surface): The surface to draw on.
+        *   `game_menu_back_button` (Button): The Button object for returning from the game menu (likely unused or represents a specific button).
+        *   `game_buttons` (List[Button]): A list of Button objects representing the player's action choices.
+    *   **Description:** Draws the in-game battle menu interface. This includes drawing a light gray rectangle at the bottom third, the "Game Menu" title, two decorative circles (blue and red), the provided back/action buttons.
+
+6.  **Name:** `draw_options_menu`
+    *   **Parameters:**
+        *   `screen` (pygame.Surface): The surface to draw on.
+        *   `options_back_button` (Button): The Button object for returning from the options menu.
+        *   `options_buttons` (List[Button]): A list of Button objects for the different options.
+    *   **Description:** Fills the screen with white, draws the "Options" title, and draws the provided back button and options buttons.
+
+7.  **Name:** `draw_text`
+    *   **Parameters:**
+        *   `text` (str): The text string to render.
+        *   `font` (pygame.font.Font): The font object to use.
+        *   `color` (tuple): The RGB color tuple for the text.
+        *   `surface` (pygame.Surface): The surface to draw the text onto.
+        *   `x` (int): The x-coordinate of the top-left corner of the text.
+        *   `y` (int): The y-coordinate of the top-left corner of the text.
+    *   **Description:** Renders the given text using the specified font and color and then draws (blits) it onto the target surface at the given coordinates. (Note: This function definition appears twice in the file).
+
+8.  **Name:** `draw_main_menu`
+    *   **Parameters:**
+        *   `screen` (pygame.Surface): The main display surface.
+        *   `images` (dict): A dictionary containing loaded images, expecting an image under the key "mii_channel".
+        *   `menu_offset` (int): The horizontal offset for drawing this menu surface (used for sliding animation).
+        *   `title_font` (pygame.font.Font): Font object (currently unused within the function).
+        *   `button_positions` (tuple): A tuple containing pre-calculated coordinates for button placement.
+    *   **Description:** Draws the first main menu screen ("Mii Channel" theme). It creates a new surface, blits the "mii_channel" background onto it, creates invisible buttons (using `buttonsFromRect.create_button`) over specific areas for "Import Mii", "Trade Mii", and "Next", and then blits this menu surface onto the main `screen` at the given `menu_offset`. Returns the created button rectangles and actions.
+
+9.  **Name:** `draw_second_menu`
+    *   **Parameters:**
+        *   `screen` (pygame.Surface): The main display surface.
+        *   `images` (dict): A dictionary containing loaded images, expecting an image under the key "fight_menu".
+        *   `menu_offset` (int): The horizontal offset for drawing this menu surface (used for sliding animation).
+        *   `title_font` (pygame.font.Font): Font object (currently unused within the function).
+        *   `button_positions` (tuple): A tuple containing pre-calculated coordinates for button placement.
+    *   **Description:** Draws the second main menu screen ("Fight Menu" theme). It creates a new surface, blits the "fight_menu" background onto it, creates invisible buttons over specific areas for "Train", "Compete", and "Back", and then blits this menu surface onto the main `screen` offset by `menu_offset + globalSettings.SCREEN_WIDTH`. Returns the created button rectangles and actions.
+
+10. **Name:** `draw_save_menu`
+    *   **Parameters:**
+        *   `screen` (pygame.Surface): The main display surface.
+        *   `save_menu_buttons` (list): A list of tuples, where each tuple likely contains `(pygame.Rect, action, text)`.
+    *   **Description:** Draws a semi-transparent overlay for the save/load menu. It iterates through the `save_menu_buttons`, calculates centered positions based on constants from `globalSettings`, updates the button rectangles, draws a background rectangle for each button, and draws the button's text label using the `draw_text` function.
+
+**Variables:**
+
+*   **None defined at the global scope within this file.**
+    *   **Note:** This file primarily defines drawing functions. It imports and heavily relies on `globalSettings` for constants (colors, dimensions, font sizes) and potentially other modules like `game`, `buttons`, and `buttonsFromRect` for type hints or object interactions, but it does not define its own global variables.

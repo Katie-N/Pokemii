@@ -1,0 +1,12 @@
+File: tradeMii.py Summary
+
+**Functions:**
+
+1.  **Name:** `tradeMiis`
+    *   **Parameters:** None.
+    *   **Description:** This function currently prints the message "time to trade some miis!" to the console. It likely serves as a placeholder or entry point for future Mii trading functionality.
+
+**Variables:**
+
+*   **None defined at the global scope within this file.**
+    *   **Note:** This file does not define any global variables.

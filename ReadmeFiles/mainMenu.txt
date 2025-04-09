@@ -1,0 +1,60 @@
+File: mainMenu.py Summary
+
+**Functions:**
+
+1.  **Name:** `load_images`
+    *   **Parameters:**
+        *   `assets_path` (str): The file path to the directory containing the menu image assets.
+    *   **Description:** Loads image files ("MiiChannel.png", "fightMenu.png", "save.png", "cursor.png") from the specified `assets_path`. It scales the background images to the screen size defined in `globalSettings`, scales the save button image to `globalSettings.SAVE_BUTTON_SIZE`, and scales the cursor image. It handles potential `pygame.error` or `FileNotFoundError` during loading.
+    *   **Returns:** A dictionary where keys are image identifiers (e.g., "mii_channel", "fight_menu", "save_button", "cursor.png") and values are the corresponding loaded and scaled `pygame.Surface` objects. Returns an empty dictionary if errors occur.
+
+2.  **Name:** `handle_menu_sliding`
+    *   **Parameters:**
+        *   `second_menu_visible` (bool): A flag indicating if the second menu (fight menu) should be sliding into view or is currently visible.
+        *   `menu_offset` (int): The current horizontal pixel offset of the menu surfaces.
+        *   `menu_slide_speed` (int): The number of pixels to slide the menu per frame.
+    *   **Description:** Calculates the new horizontal `menu_offset` to create a sliding animation between the first and second menus. If `second_menu_visible` is true, it decreases the offset (slides left) until it reaches the width of one screen (`-globalSettings.SCREEN_WIDTH`). If false, it increases the offset (slides right) until it reaches 0.
+    *   **Returns:** The updated `menu_offset` (int).
+
+3.  **Name:** `handle_events`
+    *   **Parameters:**
+        *   `train_button` (tuple): Button data (Rect, action) for the Train button.
+        *   `compete_button` (tuple): Button data (Rect, action) for the Compete button.
+        *   `next_button` (tuple): Button data (Rect, action) for the Next arrow button.
+        *   `importMii_button` (tuple): Button data (Rect, action) for the Import Mii button.
+        *   `tradeMii_button` (tuple): Button data (Rect, action) for the Trade Mii button.
+        *   `back_button` (tuple): Button data (Rect, action) for the Back arrow button.
+        *   `second_menu_visible` (bool): Current visibility state of the second menu.
+        *   `save_button` (tuple): Button data (Rect, action) for the main Save icon button.
+        *   `save_menu_buttons` (list): A list of button data tuples `(Rect, action, text)` for the save/load menu options.
+        *   `save_menu_visible` (bool): Current visibility state of the save menu overlay.
+    *   **Description:** Processes Pygame events (quitting, mouse clicks). It checks for collisions between the mouse position and the various button rectangles (`button[0]`). Based on which menu (`second_menu_visible`) or overlay (`save_menu_visible`) is active, it triggers corresponding actions (`button1`), calls functions from imported modules (`importMiis`, `tradeMiis`, `beginTraining`, `beginCompeting`, `save_file_manager` functions), or updates the menu visibility state flags.
+    *   **Returns:** A tuple of booleans: `(quit_game, back_to_main, updated_second_menu_visible, updated_save_menu_visible)`.
+
+4.  **Name:** `main_menu`
+    *   **Parameters:** None.
+    *   **Description:** This is the main function that runs the entire menu system. It initializes the display caption, loads images, calculates button positions, sets up menu state variables (offset, visibility flags), creates the save button and save menu buttons, and enters the main loop. Inside the loop, it handles drawing the menus (using `draw.draw_main_menu`, `draw.draw_second_menu`), processes events (using `handle_events`), updates the menu sliding animation (using `handle_menu_sliding`), draws the save button image, draws the save menu overlay if active (using `draw.draw_save_menu`), draws the custom cursor (using `cursor.specialCursor`), updates the display, and controls the frame rate. The loop continues until `handle_events` signals to quit. It calls `pygame.quit()` upon exiting the loop.
+
+**Variables:**
+
+*   **Global Variables Initialized/Set in this file:**
+    *   `globalSettings.screen`: While defined in `globalSettings.py`, the actual Pygame Surface object is created and assigned here using `pygame.display.set_mode(globalSettings.SCREEN_SIZE)`.
+*   **Local Variables (within `main_menu`):**
+    *   `assets_path` (str): Path to the menu assets directory.
+    *   `images` (dict): Stores loaded and scaled image surfaces returned by `load_images`.
+    *   `title_font` (pygame.font.Font): Font object (currently unused but loaded).
+    *   `button_positions` (tuple): Stores calculated coordinates for button placement from `buttonsFromRect.calculate_button_positions`.
+    *   `(button_y, left_button_x, ...)` (int): Unpacked coordinate values from `button_positions`.
+    *   `menu_offset` (int): Current horizontal position for menu sliding.
+    *   `menu_slide_speed` (int): Speed of the menu sliding animation.
+    *   `second_menu_visible` (bool): Flag indicating if the second menu (fight menu) is the active one.
+    *   `save_menu_visible` (bool): Flag indicating if the save/load menu overlay is visible.
+    *   `clock` (pygame.time.Clock): Pygame clock object for controlling frame rate.
+    *   `FPS` (int): Target frames per second.
+    *   `save_button` (tuple): Button data (Rect, action, image) for the main save icon button.
+    *   `save_menu_buttons` (list): List of button data tuples `(Rect, action, text)` for the save/load menu options.
+    *   `running` (bool): Controls the main loop of the menu system.
+    *   `importMii_button`, `tradeMii_button`, `next_button` (tuple): Button data returned by `draw.draw_main_menu` each frame.
+    *   `train_button`, `compete_button`, `back_button` (tuple): Button data returned by `draw.draw_second_menu` each frame.
+    *   `quit_game`, `back_to_main` (bool): Flags returned by `handle_events` to control loop execution and menu state.
+*   **Note:** This file heavily imports and uses functions and variables from other modules like `globalSettings`, `draw`, `buttonsFromRect`, `cursor`, `save_file_manager`, and the game state modules (`train`, `compete`, `importMii`, `tradeMii`).

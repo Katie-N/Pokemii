@@ -1,0 +1,46 @@
+File: save_file_manager.py Summary
+
+**Classes:**
+
+1.  **Name:** `SaveFileManager`
+    *   **Description:** A class designed to handle operations related to saving and loading game data to/from CSV files within a specified directory.
+    *   **Methods (Functions within the class):**
+        *   **Name:** `__init__`
+            *   **Parameters:**
+                *   `self` (implicit instance reference).
+                *   `save_directory` (str, optional): The name of the directory to store save files. Defaults to "saves".
+            *   **Description:** Constructor for the `SaveFileManager` class. Initializes the `save_directory` attribute and creates the directory if it doesn't exist.
+        *   **Name:** `get_save_files`
+            *   **Parameters:** `self`.
+            *   **Description:** Scans the `save_directory` and returns a list of filenames that end with ".csv".
+            *   **Returns:** `list` of strings (filenames).
+        *   **Name:** `load_save_file`
+            *   **Parameters:**
+                *   `self`.
+                *   `filename` (str): The name of the CSV save file to load (within the `save_directory`).
+            *   **Description:** Reads data from the specified CSV file using `csv.DictReader`. Handles potential file not found errors and other exceptions during loading.
+            *   **Returns:** A `list` of dictionaries (each dictionary represents a row in the CSV), or `None` if an error occurs.
+        *   **Name:** `save_data`
+            *   **Parameters:**
+                *   `self`.
+                *   `filename` (str): The name of the CSV file to save to (within the `save_directory`).
+                *   `data` (list): The data to be saved. Expected to be a list of dictionaries (for `DictWriter`) or a list of lists/tuples (for `writer`).
+            *   **Description:** Writes the provided `data` to the specified CSV file. It uses `csv.DictWriter` if the data appears to be a list of dictionaries (checking the first element), otherwise uses `csv.writer`. Handles potential exceptions during saving.
+    *   **Instance Variables (Attributes initialized in `__init__`):**
+        *   `save_directory`: (str) The path to the directory where save files are stored.
+
+**Functions (Standalone):**
+
+1.  **Name:** `selectSave`
+    *   **Parameters:**
+        *   `filename` (str): The name of the save file selected by the user.
+    *   **Description:** Takes a filename, validates if it exists among the available save files managed by the global `save_manager` instance. If valid, it loads the data using `save_manager.load_save_file` and prints the filename and its contents. Prints an error message if the filename is invalid.
+    *   **Returns:** `-1` if the filename is invalid, otherwise implicitly returns `None`.
+
+2.  **Name:** `create_new_save`
+    *   **Parameters:** None.
+    *   **Description:** Prompts the user to enter a name for a new save file via console input (`input()`). Creates a default data structure (a list containing two dictionaries) and saves it to a new CSV file named `<name>.csv` using the global `save_manager` instance. Prints a confirmation message.
+
+**Global Variables:**
+
+*   **save_manager:** (SaveFileManager) An instance of the `SaveFileManager` class, created immediately after the class definition. This instance is used by the standalone functions (`selectSave`, `create_new_save`) to interact with the save file system.
