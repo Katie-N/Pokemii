@@ -10,26 +10,6 @@ import buttons
 # Initialize Pygame
 pygame.init()
 
-# --- Constants ---
-# Colors
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GREEN = (0, 255, 0)
-
-# Screen dimensions
-infoObject = pygame.display.Info()
-MAX_WIDTH = infoObject.current_w
-MAX_HEIGHT = infoObject.current_h
-
-if MAX_WIDTH / MAX_HEIGHT >= 16 / 9:
-    SCREEN_HEIGHT = MAX_HEIGHT
-    SCREEN_WIDTH = int(SCREEN_HEIGHT * 16 / 9)
-else:
-    SCREEN_WIDTH = MAX_WIDTH
-    SCREEN_HEIGHT = int(SCREEN_WIDTH * 9 / 16)
-
-SCREEN_SIZE = (SCREEN_WIDTH, SCREEN_HEIGHT)
-
 # --- Functions ---
 
 def main():
