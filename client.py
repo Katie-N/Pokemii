@@ -2,6 +2,7 @@ import pygame
 import socket
 import threading
 import json
+import globalSettings
 
 # Initialize Pygame
 pygame.init()
@@ -77,8 +78,8 @@ harden_active = False
 empower_active = False
 
 # --- Network Variables ---
-HOST = '192.168.12.112'  # Server IP address
-PORT = 5555
+HOST = globalSettings.serverIP  # Server IP address
+PORT = globalSettings.serverPort
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client_socket.connect((HOST, PORT))
 

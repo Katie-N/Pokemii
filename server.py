@@ -2,9 +2,10 @@ import socket
 import threading
 import json
 import random
+import globalSettings
 
 class GameServer:
-    def __init__(self, host='127.0.0.1', port=5555):
+    def __init__(self, host=globalSettings.serverIP, port=globalSettings.serverPort):
         self.host = host
         self.port = port
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
