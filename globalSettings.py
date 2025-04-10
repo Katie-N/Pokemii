@@ -67,3 +67,9 @@ SAVE_MENU_BUTTON_SPACING = 70 # New constant for save menu button spacing
 
 font = pygame.font.Font(None, FONT_SIZE)
 large_font = pygame.font.Font(None, LARGE_FONT_SIZE)
+
+saveData = {}
+images = None
+
+serverIP = '192.168.12.127'
+serverPort = '5555'

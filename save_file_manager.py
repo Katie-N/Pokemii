@@ -1,94 +1,117 @@
 import os
 import csv
+import globalSettings
 
 class SaveFileManager:
-    def __init__(self, save_directory="saves"):
+    def __init__(self, save_directory="saves", save_file="Players.csv"):
         self.save_directory = save_directory
+        self.save_file = save_file
+        self.save_filepath = os.path.join(self.save_directory, self.save_file)
         if not os.path.exists(self.save_directory):
             os.makedirs(self.save_directory)
+        if not os.path.exists(self.save_filepath):
+            self.__create_empty_save_file__()
 
-    def get_save_files(self):
-        """Returns a list of available save files (CSV files) in the save directory."""
-        save_files = []
-        for filename in os.listdir(self.save_directory):
-            if filename.endswith(".csv"):
-                save_files.append(filename)
-        return save_files
+    def __create_empty_save_file__(self):
+        """Creates an empty save file with headers if it doesn't exist."""
+        with open(self.save_filepath, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["Id","Name", "Score", "Health", "Team Member 1", "Team Member 2", "Team Member 3"])  # Add headers
+            print("wrote empty new save file")
 
-    def load_save_file(self, filename):
-        """Loads data from a specified save file."""
-        filepath = os.path.join(self.save_directory, filename)
-        if not os.path.exists(filepath):
-            print(f"Error: Save file '{filename}' not found.")
-            return None
-
+    def get_save_file_ids(self):
+        """Returns a list of available save names from the save file."""
+        save_ids = []
+        print("get_save_file")
         try:
-            with open(filepath, 'r', newline='') as file:
+            with open(self.save_filepath, 'r', newline='') as file:
                 reader = csv.DictReader(file)
-                data = [row for row in reader]
-                return data
+                for row in reader:
+                    save_ids.append(row["Id"])
+        except Exception as e:
+            print(f"Error reading save file: {e}")
+        print(save_ids)
+        return save_ids
+
+    def load_save_file(self, save_id):
+        """Loads data from a specified save name."""
+        try:
+            with open(self.save_filepath, 'r', newline='') as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    if row["Id"] == save_id:
+                        print(row)
+                        return row
         except Exception as e:
             print(f"Error loading save file: {e}")
-            return None
+        return None
 
-    def save_data(self, filename, data):
-        """Saves data to a specified save file."""
-        filepath = os.path.join(self.save_directory, filename)
+    # Function to update the player.csv file with the latest data
+    # Call this function after the player levels up, loses health, imports a mii, etc. 
+    def save_data(self, save_id, data):
+        """Saves data to a specified save name."""
         try:
-            with open(filepath, 'w', newline='') as file:
-                if data and isinstance(data[0], dict):
-                    writer = csv.DictWriter(file, fieldnames=data[0].keys())
+            existing_data = []
+            save_found = False
+            with open(self.save_filepath, 'r', newline='') as file:
+                reader = csv.DictReader(file)
+                existing_data = list(reader)
+                for row in existing_data:
+                    if row["Id"] == save_id:
+                        row.update(data)
+                        save_found = True
+                        break
+            if not save_found:
+                data["Id"] = save_id
+                existing_data.append(data)
+
+            with open(self.save_filepath, 'w', newline='') as file:
+                if existing_data:
+                    writer = csv.DictWriter(file, fieldnames=existing_data[0].keys())
                     writer.writeheader()
-                    writer.writerows(data)
-                else:
-                    writer = csv.writer(file)
-                    writer.writerows(data)
+                    writer.writerows(existing_data)
         except Exception as e:
             print(f"Error saving data: {e}")
 
-    # def choose_save_file(self):
-    #     """Allows the user to choose a save file from the console."""
-    #     save_files = self.get_save_files()
+    def new_player(self, name=""):
+        # Get existing save IDs and find the next unused number
+        existing_ids = self.get_save_file_ids()
+        used_ids = set()
 
-    #     if not save_files:
-    #         new_data = [{"name": "Player 1", "score": 100}, {"name": "Player 2", "score": 150}]
-    #         print("No save files found.")
-    #         name = input("Name for new save:")
-    #         self.save_data(f"{name}.csv", new_data)
-    #         return self.get_save_files()[0]
-    #     else:
-    #         print("Available save files:")
-    #         for i, filename in enumerate(save_files):
-    #             print(f"{i + 1}. {filename}")
-    #         while True:
-    #             try:
-    #                 choice = int(input("Enter the number of the save file to load: "))
-    #                 if 1 <= choice <= len(save_files):
-    #                     return save_files[choice - 1]
-    #                 else:
-    #                     print("Invalid choice. Please enter a number from the list.")
-    #             except ValueError:
-    #                 print("Invalid input. Please enter a number.")
+        for save_id in existing_ids:
+            try:
+                used_ids.add(int(save_id))
+            except ValueError:
+                pass  # Skip any non-integer IDs
+
+        # Find the smallest unused integer ID starting from 1
+        next_id = 1
+        while next_id in used_ids:
+            next_id += 1
+
+        # Use the new ID
+        new_id = str(next_id)
+
+        new_data = {
+            "Id": new_id,
+            "Name": name,
+            "Score": "0",
+            "Health": "100",
+            "Team Member 1": "",
+            "Team Member 2": "",
+            "Team Member 3": ""
+        }
+
+        self.save_data(new_id, new_data)
+        print(f"Created new player save with Id '{new_id}'")
+        return new_id  # In case you want to use it after creation
+    def login_user(self, saveId, saveData = None):
+        if (saveData):
+            globalSettings.saveData = saveData
+        else:
+            globalSettings.saveData = self.load_save_file(saveId)
+
 
 # SAVING LOGIC
 # --- Save File Manager ---
 save_manager = SaveFileManager()
-
-def selectSave(filename):
-    if not filename or (filename not in save_manager.get_save_files()):
-        print("Invalid filename")
-        return -1
-    data = save_manager.load_save_file(filename)
-    print(f"You selected: {filename}\nWhich has the data: {data}")
-    # if data:
-    #     print("Loaded data:")
-    #     for row in data:
-    #         print(row)
-    # else:
-    #     print("Failed to load data.")
-
-def create_new_save():
-    new_data = [{"name": "Player 1", "score": 100}, {"name": "Player 2", "score": 150}]
-    name = input("Name for new save:")
-    save_manager.save_data(f"{name}.csv", new_data)
-    print(f"Created new save file: {name}.csv")
