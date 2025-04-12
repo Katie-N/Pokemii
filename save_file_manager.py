@@ -27,29 +27,31 @@ class SaveFileManager:
             with open(self.save_filepath, 'r', newline='') as file:
                 reader = csv.DictReader(file)
                 for row in reader:
-                    save_ids.append(row["Id"])
+                    save_ids.append(int(row["Id"]))
         except Exception as e:
             print(f"Error reading save file: {e}")
         print(save_ids)
         return save_ids
 
+    # Convert the row from a string to a dictionary (including int and float conversion)
+    # This function *should* take the integer version of save_id but it will work with the string too.
     def load_save_file(self, save_id):
         """Loads data from a specified save name."""
         try:
             with open(self.save_filepath, 'r', newline='') as file:
                 reader = csv.DictReader(file)
                 for row in reader:
-                    if row["Id"] == save_id:
-                        print(dict(row))
-                        dictVersion = {}
-                        for key, value in row:
+                    if int(row["Id"]) == int(save_id):
+                        for key, value in row.items():
                             print(key, value)
                             if value and value.isdigit():
-                                dictVersion[key] = int(value)
+                                row[key] = int(value)
                             else:
-                                dictVersion[key] = value
-                        print("Dict: ", dictVersion)
-                        return dictVersion
+                                try:
+                                    row[key] = float(value)
+                                except ValueError:
+                                    row[key] = value
+                        return row
         except Exception as e:
             print(f"Error loading save file: {e}")
         return None
@@ -58,7 +60,7 @@ class SaveFileManager:
     # Call this function after the player levels up, loses health, imports a mii, etc. 
     def save_progress(self):
         """Saves data to a specified save name."""
-        if not globalSettings.save_id:
+        if globalSettings.saveData["Id"] == None:
             print("No save ID. Make a new save before trying to save progress.")
             return -1
         try:
@@ -67,9 +69,9 @@ class SaveFileManager:
                 reader = csv.DictReader(file)
                 headers = reader.fieldnames
                 for row in reader:
-                    if row["Id"] == globalSettings.save_id:
-                        row.update(globalSettings.save_data)  # Update the row with new data
-                rows.append(row)
+                    if row["Id"] == globalSettings.saveData["Id"]:
+                        row.update(globalSettings.saveData)  # Update the row with new data
+                    rows.append(row)
 
             with open(self.save_filepath, 'w', newline='') as file:
                 writer = csv.DictWriter(file, fieldnames=headers)
@@ -107,9 +109,9 @@ class SaveFileManager:
             "Level" : 0, 
             "Current Health" : 100,
             "Max Health" : 100, 
-            "Team Member 1" : None, 
-            "Team Member 2" : None, 
-            "Team Member 3" : None
+            "Team Member 1" : '', 
+            "Team Member 2" : '', 
+            "Team Member 3" : ''
         }
 
         self.save_progress(new_id, new_data)
@@ -120,7 +122,13 @@ class SaveFileManager:
         if (saveData):
             globalSettings.saveData = saveData        
         else:
-            globalSettings.saveData = self.load_save_file(saveId)
+            if saveId != globalSettings.saveData["Id"]:
+                saveFile = self.load_save_file(saveId)
+                if saveFile:
+                    globalSettings.saveData = saveFile
+                else:
+                    print(f"Error: Save file with Id '{saveId}' does not exist.")
+                    return -1
 
 
 # SAVING LOGIC

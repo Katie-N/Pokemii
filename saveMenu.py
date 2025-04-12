@@ -108,6 +108,7 @@ def save_menu(screen, title_font, close_button_rect):
                     running = False
                 for button in save_menu_buttons:
                     if button[0].collidepoint(mouse_pos) and button[1]:
-                        button[1]()
-                        # Regenerate the save menu buttons after a save is selected just in case it was a new save
-                        save_menu_buttons = create_save_menu_buttons()
+                        button[1]() # Call the action of the button
+                        # Regenerate the save menu buttons after the new save button is selected
+                        if button == save_menu_buttons[-1]: 
+                            save_menu_buttons = create_save_menu_buttons()

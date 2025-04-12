@@ -16,6 +16,7 @@ class Game:
 
     def __init__(self):
         self.opponentHealth = 100
+        self.opponentMaxHealth = 100
         self.turn = 1
         self.harden_active = False
         self.empower_active = False
@@ -90,7 +91,7 @@ class Game:
     def check_win(self):
         """Checks if the player has won and updates experience."""
         if self.opponentHealth <= 0:
-            self.experience += 50  # Increase experience on win
+            globalSettings.saveData["Experience"] += 50  # Increase experience on win
             self.check_level_up()
             save_file_manager.save_manager.save_progress()  # Save progress to the save file
         print("RESETTING")
@@ -98,7 +99,7 @@ class Game:
 
     def check_level_up(self):
         """Checks if the player has leveled up."""
-        while self.experience >= self.experience_needed:
+        while globalSettings.saveData["Experience"] >= self.experience_needed:
             globalSettings.saveData["Level"] += 1
             globalSettings.saveData["Experience"] -= self.experience_needed
             self.experience_needed += 50  # Increase experience needed for next level
