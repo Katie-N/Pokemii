@@ -108,8 +108,11 @@ class SaveFileManager:
     def login_user(self, saveId, saveData = None):
         if (saveData):
             globalSettings.saveData = saveData
+            print("printing from if", globalSettings.saveData)
+        
         else:
             globalSettings.saveData = self.load_save_file(saveId)
+            print(globalSettings.saveData)
 
 
 # SAVING LOGIC

@@ -12,7 +12,7 @@ def create_save_menu_buttons():
         save_menu_buttons.append(
             (
                 pygame.Rect(0, 0, 0, 0),
-                lambda saveData=saveData: save_file_manager.save_manager.login_user(saveData),
+                lambda saveData=saveData: save_file_manager.save_manager.login_user(saveId, saveData),
                 saveData["Name"],
             )
         )
