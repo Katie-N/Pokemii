@@ -68,10 +68,15 @@ class SaveFileManager:
             with open(self.save_filepath, 'r', newline='') as file:
                 reader = csv.DictReader(file)
                 headers = reader.fieldnames
+                foundID = False
                 for row in reader:
-                    if row["Id"] == globalSettings.saveData["Id"]:
+                    if int(row["Id"]) == int(globalSettings.saveData["Id"]):
                         row.update(globalSettings.saveData)  # Update the row with new data
+                        foundID = True
                     rows.append(row)
+                # If the ID was not found that means this is a new save so append it to the end
+                if not foundID:
+                    rows.append(globalSettings.saveData)
 
             with open(self.save_filepath, 'w', newline='') as file:
                 writer = csv.DictWriter(file, fieldnames=headers)
@@ -95,12 +100,9 @@ class SaveFileManager:
                 pass  # Skip any non-integer IDs
 
         # Find the smallest unused integer ID starting from 1
-        next_id = 1
-        while next_id in used_ids:
-            next_id += 1
-
-        # Use the new ID
-        new_id = str(next_id)
+        new_id = 1
+        while new_id in used_ids:
+            new_id += 1
 
         new_data = {
             "Id" : new_id,
@@ -114,7 +116,8 @@ class SaveFileManager:
             "Team Member 3" : ''
         }
 
-        self.save_progress(new_id, new_data)
+        globalSettings.saveData = new_data  # Update the global save data
+        self.save_progress()
         print(f"Created new player save with Id '{new_id}'")
         return new_id  # In case you want to use it after creation
     
