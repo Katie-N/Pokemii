@@ -1,5 +1,5 @@
-Id,Name,Score,Health,Team Member 1,Team Member 2,Team Member 3
-0,Katie,100,100,0,1,2
-1,Lucas,0,50,0,0,0
-2,katie23,0,100,,,
-3,ok,0,100,,,
+Id,Name,Experience,Level,Current Health,Max Health,Team Member 1,Team Member 2,Team Member 3
+0,Katie,0,0,100,100,0,1,2
+1,Lucas,0,25,50,100,0,0,0
+2,katie23,0,100,,,,
+3,ok,0,100,,,,
