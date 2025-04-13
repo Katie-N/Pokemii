@@ -67,8 +67,8 @@ def back_to_menu(game: Game):
 def create_game_menu_buttons(font: pygame.font.Font, game: Game) -> List[Button]:
     """Creates the game menu buttons."""
     game_button_width = globalSettings.SCREEN_WIDTH // 2
-    game_button_height = globalSettings.SCREEN_HEIGHT // 6
-    game_button_y = globalSettings.SCREEN_HEIGHT - globalSettings.SCREEN_HEIGHT // 3
+    game_button_height = globalSettings.SCREEN_HEIGHT // 10
+    game_button_y = globalSettings.SCREEN_HEIGHT - globalSettings.SCREEN_HEIGHT // 5
     return [
         Button(0, game_button_y, game_button_width, game_button_height, "Kick", globalSettings.LIGHT_BLUE, globalSettings.GRAY, font, game.player_kick),
         Button(0, game_button_y + game_button_height, game_button_width, game_button_height, "Heal", globalSettings.LIGHT_BLUE, globalSettings.GRAY, font, game.player_heal),

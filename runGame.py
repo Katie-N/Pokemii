@@ -26,19 +26,17 @@ def run_game():
                     button.handle_event(event)
 
         globalSettings.screen.fill(globalSettings.WHITE)
-
-        if globalSettings.current_state == GameState.GAME_MENU:
-            draw.draw_game_menu(globalSettings.screen, game_menu_buttons[-1], game_menu_buttons[:-1])
-            draw.draw_health_bar(globalSettings.screen, 20, 100, 200, 20, globalSettings.saveData["Current Health"], globalSettings.saveData["Max Health"], globalSettings.saveData["Name"], "Harden" if game.harden_active else None)
-            draw.draw_health_bar(globalSettings.screen, globalSettings.SCREEN_WIDTH - 220, 100, 200, 20, game.opponentHealth, game.opponentMaxHealth, "Opponent")
-            draw.draw_experience_bar(globalSettings.screen, 20, 150, 200, 10, globalSettings.saveData["Experience"], game.experience_needed, globalSettings.saveData["Level"])
-            draw.draw_turn(globalSettings.screen, game)
-        elif globalSettings.current_state == GameState.MENU:
-            return
-        specialCursor(globalSettings.screen, globalSettings.images["cursor.png"])
+        draw.draw_background(globalSettings.screen, globalSettings.images["blurryWuhu"])
+        draw.draw_game_HUD(game)
+        draw.draw_game_menu(globalSettings.screen, game_menu_buttons[-1], game_menu_buttons[:-1])
+        draw.draw_turn(globalSettings.screen, game)
+        
+        specialCursor(globalSettings.screen, globalSettings.images["cursor"])
         
         pygame.display.flip()
         clock.tick(60)
+        if globalSettings.current_state == GameState.MENU:
+            return
 
     # Optional fallback in case loop exits normally
     globalSettings.current_state = GameState.MENU

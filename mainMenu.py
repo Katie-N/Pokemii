@@ -17,15 +17,17 @@ pygame.init()
 # Initalize the screen
 globalSettings.screen = pygame.display.set_mode(globalSettings.SCREEN_SIZE)
 
-def load_images(assets_path):
-    """Loads and scales background images."""
+def load_images():
+    """Loads and scales all of the images as soon as the game is launched"""
     images = {}
     try:
-        pic1_path = os.path.join(assets_path, "MiiChannel.png")
-        pic2_path = os.path.join(assets_path, "fightMenu.png")
-        save_image_path = os.path.join(assets_path, "save.png")
-        cursor_image_path = os.path.join(assets_path, "cursor.png")
-
+        pic1_path = os.path.join(globalSettings.menu_path, "MiiChannel.png")
+        pic2_path = os.path.join(globalSettings.menu_path, "fightMenu.png")
+        save_image_path = os.path.join(globalSettings.menu_path, "save.png")
+        cursor_image_path = os.path.join(globalSettings.menu_path, "cursor.png")
+        backgroundPicPath = os.path.join(globalSettings.fight_background_path, "blurryWuhu.png")
+        fightingMatsPath = os.path.join(globalSettings.fight_background_path, "fightingMats.png")
+        
         if os.path.exists(pic1_path):
             images["mii_channel"] = pygame.image.load(pic1_path).convert()
             images["mii_channel"] = pygame.transform.scale(images["mii_channel"], globalSettings.SCREEN_SIZE)
@@ -43,12 +45,25 @@ def load_images(assets_path):
             images["save_button"] = pygame.transform.scale(images["save_button"], (globalSettings.SAVE_BUTTON_SIZE, globalSettings.SAVE_BUTTON_SIZE))
         else:
             raise FileNotFoundError(f"Image file not found: {save_image_path}")
+
         if os.path.exists(cursor_image_path):
-            images["cursor.png"] = pygame.image.load(cursor_image_path).convert_alpha()
-            images["cursor.png"] = pygame.transform.scale(images["cursor.png"], (75,75))
+            images["cursor"] = pygame.image.load(cursor_image_path).convert_alpha()
+            images["cursor"] = pygame.transform.scale(images["cursor"], (75,75))
         else:
             raise FileNotFoundError(f"Image file not found: {cursor_image_path}")
 
+        if os.path.exists(backgroundPicPath):
+            images["blurryWuhu"] = pygame.image.load(backgroundPicPath).convert()
+            images["blurryWuhu"] = pygame.transform.scale(images["blurryWuhu"], globalSettings.SCREEN_SIZE)
+        else:
+            raise FileNotFoundError(f"Image file not found: {backgroundPicPath}")    
+    
+        if os.path.exists(fightingMatsPath):
+            images["fightingMats"] = pygame.image.load(fightingMatsPath).convert_alpha()
+            images["fightingMats"] = pygame.transform.scale(images["fightingMats"], globalSettings.SCREEN_SIZE)
+        else:
+            raise FileNotFoundError(f"Image file not found: {fightingMatsPath}")    
+        
         return images
 
     except (pygame.error, FileNotFoundError) as e:
@@ -127,8 +142,7 @@ def main_menu():
     pygame.display.set_caption("Main Menu")
 
     # Load images
-    assets_path = os.path.join(".", "assets", "menus")
-    globalSettings.images = load_images(assets_path)
+    globalSettings.images = load_images()
     if not globalSettings.images:
         return
 
@@ -221,7 +235,7 @@ def main_menu():
         save_button[0].topleft = (pick_save_x, pick_save_y)
         globalSettings.screen.blit(globalSettings.images["save_button"], (pick_save_x, pick_save_y))
 
-        specialCursor(globalSettings.screen, globalSettings.images["cursor.png"])
+        specialCursor(globalSettings.screen, globalSettings.images["cursor"])
 
         pygame.display.flip()
         clock.tick(FPS)

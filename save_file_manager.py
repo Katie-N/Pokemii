@@ -16,7 +16,7 @@ class SaveFileManager:
         """Creates an empty save file with headers if it doesn't exist."""
         with open(self.save_filepath, 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(["Id","Name", "Experience", "Level", "CurrentHealth", "MaxHealth", "Team Member 1", "Team Member 2", "Team Member 3"])  # Add headers
+            writer.writerow(["Id","Name", "Experience", "Level", "Current Health", "Max Health", "Team Member 1", "Team Member 2", "Team Member 3"])  # Add headers
             print("wrote empty new save file")
 
     def get_save_file_ids(self):
