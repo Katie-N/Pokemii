@@ -17,6 +17,7 @@ class Game:
     def __init__(self):
         self.opponentHealth = 100
         self.opponentMaxHealth = 100
+        self.gameOver = False
         self.turn = 1
         self.harden_active = False
         self.empower_active = False
@@ -52,15 +53,19 @@ class Game:
 
     def end_turn(self):
         """Ends the current turn and switches to the next."""
-        print("Turn Ended")
-        if globalSettings.saveData["Current Health"] <= 0 or self.opponentHealth <= 0:
-            self.check_win()
-        elif self.turn == 1:
-            self.turn = 2
-            self.opponent_turn()
-        elif self.turn == 2:
-            self.turn = 1
-            self.harden_active = False
+        # Only execute the turn if the game is not over.
+        # This fixed the bug where the game would end, everything would be reset, but the queued end_turn() calls would execute. 
+        if self.gameOver == False:
+            print("Turn Ended")
+
+            if globalSettings.saveData["Current Health"] <= 0 or self.opponentHealth <= 0:
+                self.check_win()
+            elif self.turn == 1:
+                self.turn = 2
+                self.opponent_turn()
+            elif self.turn == 2:
+                self.turn = 1
+                self.harden_active = False
 
     def player_kick(self):
         """Handles the player's kick action."""
@@ -75,7 +80,8 @@ class Game:
         """Handles the player's heal action."""
         if globalSettings.saveData["Current Health"] < globalSettings.saveData["Max Health"]:
             globalSettings.saveData["Current Health"] += 20
-        globalSettings.saveData["Current Health"] = min(globalSettings.saveData["Current Health"], globalSettings.saveData["MaxHealth"])
+        # Don't let the player heal over max health
+        globalSettings.saveData["Current Health"] = min(globalSettings.saveData["Current Health"], globalSettings.saveData["Max Health"])
         self.end_turn()
 
     def player_harden(self):
@@ -93,7 +99,14 @@ class Game:
         if self.opponentHealth <= 0:
             globalSettings.saveData["Experience"] += 50  # Increase experience on win
             self.check_level_up()
-            save_file_manager.save_manager.save_progress()  # Save progress to the save file
+            print("You win!")
+            # After a win the game should always end before the next turn. 
+            self.gameOver = True
+
+        elif globalSettings.saveData["Current Health"] <= 0:
+            print("You lose!")
+            # After a lose the game should always end before the next turn. 
+            self.gameOver = True
         print("RESETTING")
         self.reset_game()
 
@@ -108,6 +121,7 @@ class Game:
     def reset_game(self):
         """Resets the game state."""
         globalSettings.saveData["Current Health"] = globalSettings.saveData["Max Health"]
+        save_file_manager.save_manager.save_progress()  # Save progress to the save file
         self.opponentHealth = 100
         self.turn = 1
         self.harden_active = False
