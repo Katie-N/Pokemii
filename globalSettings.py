@@ -1,4 +1,5 @@
 import pygame
+import os
 # --- Constants ---
 # Colors
 WHITE = (255, 255, 255)
@@ -70,6 +71,10 @@ large_font = pygame.font.Font(None, LARGE_FONT_SIZE)
 
 saveData = {}
 images = None
+assets_path = os.path.join(".", "assets")
+menu_path = os.path.join(assets_path, "menus")
+mii_sprites_path = os.path.join(assets_path, "miiSprites")
+fight_background_path = os.path.join(assets_path, "fightBackgrounds")
 
 serverIP = '192.168.12.127'
 serverPort = '5555'

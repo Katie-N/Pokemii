@@ -95,7 +95,7 @@ def save_menu(screen, title_font, close_button_rect):
             ),
         )
 
-        specialCursor(globalSettings.screen, globalSettings.images["cursor.png"])
+        specialCursor(globalSettings.screen, globalSettings.images["cursor"])
 
         pygame.display.flip()
 

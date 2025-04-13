@@ -61,6 +61,17 @@ def draw_credits(screen: pygame.Surface, font: pygame.font.Font, large_font: pyg
 
     credits_back_button.draw(screen)
 
+def draw_game_HUD(game: Game):
+    """Draws the game HUD (the health and experience bars)."""
+    draw_health_bar(globalSettings.screen, 20, 100, 200, 20, globalSettings.saveData["Current Health"], globalSettings.saveData["Max Health"], globalSettings.saveData["Name"], "Harden" if game.harden_active else None)
+    draw_health_bar(globalSettings.screen, globalSettings.SCREEN_WIDTH - 220, 100, 200, 20, game.opponentHealth, game.opponentMaxHealth, "Opponent")
+    draw_experience_bar(globalSettings.screen, 20, 150, 200, 10, globalSettings.saveData["Experience"], game.experience_needed, globalSettings.saveData["Level"])
+
+def draw_background(screen: pygame.Surface, image: pygame.Surface):
+    """Draws the background image on the screen."""
+    if image:
+        screen.blit(image, (0, 0))
+
 def draw_game_menu(screen: pygame.Surface, game_menu_back_button: Button, game_buttons: List[Button]):
     """Draws the game menu screen."""
     bottom_third_height = globalSettings.SCREEN_HEIGHT // 3
