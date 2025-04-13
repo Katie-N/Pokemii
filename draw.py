@@ -67,15 +67,19 @@ def draw_game_HUD(game: Game):
     draw_health_bar(globalSettings.screen, globalSettings.SCREEN_WIDTH - 220, 100, 200, 20, game.opponentHealth, game.opponentMaxHealth, "Opponent")
     draw_experience_bar(globalSettings.screen, 20, 150, 200, 10, globalSettings.saveData["Experience"], game.experience_needed, globalSettings.saveData["Level"])
 
-def draw_background(screen: pygame.Surface, image: pygame.Surface):
+def draw_background(screen: pygame.Surface, backgroundImage: pygame.Surface):
     """Draws the background image on the screen."""
-    if image:
-        screen.blit(image, (0, 0))
+    if backgroundImage:
+        screen.blit(backgroundImage, (0, 0))
+        screen.blit(globalSettings.images["fightingMats"], (0, 0))
+    else:
+        print("Background image not found!")
+        return -1
 
 def draw_game_menu(screen: pygame.Surface, game_menu_back_button: Button, game_buttons: List[Button]):
     """Draws the game menu screen."""
-    bottom_third_height = globalSettings.SCREEN_HEIGHT // 3
-    pygame.draw.rect(screen, globalSettings.LIGHT_GRAY, (0, globalSettings.SCREEN_HEIGHT - bottom_third_height, globalSettings.SCREEN_WIDTH, bottom_third_height))
+    # bottom_third_height = globalSettings.SCREEN_HEIGHT // 3
+    # pygame.draw.rect(screen, globalSettings.LIGHT_GRAY, (0, globalSettings.SCREEN_HEIGHT - bottom_third_height, globalSettings.SCREEN_WIDTH, bottom_third_height))
 
     game_menu_text = pygame.font.Font(None, globalSettings.LARGE_FONT_SIZE).render("Game Menu", True, globalSettings.BLACK)
     game_menu_rect = game_menu_text.get_rect(center=(globalSettings.SCREEN_WIDTH // 2, 100))

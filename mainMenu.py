@@ -26,7 +26,8 @@ def load_images():
         save_image_path = os.path.join(globalSettings.menu_path, "save.png")
         cursor_image_path = os.path.join(globalSettings.menu_path, "cursor.png")
         backgroundPicPath = os.path.join(globalSettings.fight_background_path, "blurryWuhu.png")
-
+        fightingMatsPath = os.path.join(globalSettings.fight_background_path, "fightingMats.png")
+        
         if os.path.exists(pic1_path):
             images["mii_channel"] = pygame.image.load(pic1_path).convert()
             images["mii_channel"] = pygame.transform.scale(images["mii_channel"], globalSettings.SCREEN_SIZE)
@@ -57,6 +58,12 @@ def load_images():
         else:
             raise FileNotFoundError(f"Image file not found: {backgroundPicPath}")    
     
+        if os.path.exists(fightingMatsPath):
+            images["fightingMats"] = pygame.image.load(fightingMatsPath).convert_alpha()
+            images["fightingMats"] = pygame.transform.scale(images["fightingMats"], globalSettings.SCREEN_SIZE)
+        else:
+            raise FileNotFoundError(f"Image file not found: {fightingMatsPath}")    
+        
         return images
 
     except (pygame.error, FileNotFoundError) as e:
