@@ -16,7 +16,7 @@ class SaveFileManager:
         """Creates an empty save file with headers if it doesn't exist."""
         with open(self.save_filepath, 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(["Id","Name", "Score", "Health", "Team Member 1", "Team Member 2", "Team Member 3"])  # Add headers
+            writer.writerow(["Id","Name", "Experience", "Level", "CurrentHealth", "MaxHealth", "Team Member 1", "Team Member 2", "Team Member 3"])  # Add headers
             print("wrote empty new save file")
 
     def get_save_file_ids(self):
@@ -27,20 +27,30 @@ class SaveFileManager:
             with open(self.save_filepath, 'r', newline='') as file:
                 reader = csv.DictReader(file)
                 for row in reader:
-                    save_ids.append(row["Id"])
+                    save_ids.append(int(row["Id"]))
         except Exception as e:
             print(f"Error reading save file: {e}")
         print(save_ids)
         return save_ids
 
+    # Convert the row from a string to a dictionary (including int and float conversion)
+    # This function *should* take the integer version of save_id but it will work with the string too.
     def load_save_file(self, save_id):
         """Loads data from a specified save name."""
         try:
             with open(self.save_filepath, 'r', newline='') as file:
                 reader = csv.DictReader(file)
                 for row in reader:
-                    if row["Id"] == save_id:
-                        print(row)
+                    if int(row["Id"]) == int(save_id):
+                        for key, value in row.items():
+                            print(key, value)
+                            if value and value.isdigit():
+                                row[key] = int(value)
+                            else:
+                                try:
+                                    row[key] = float(value)
+                                except ValueError:
+                                    row[key] = value
                         return row
         except Exception as e:
             print(f"Error loading save file: {e}")
@@ -48,30 +58,35 @@ class SaveFileManager:
 
     # Function to update the player.csv file with the latest data
     # Call this function after the player levels up, loses health, imports a mii, etc. 
-    def save_data(self, save_id, data):
+    def save_progress(self):
         """Saves data to a specified save name."""
+        if globalSettings.saveData["Id"] == None:
+            print("No save ID. Make a new save before trying to save progress.")
+            return -1
         try:
-            existing_data = []
-            save_found = False
+            rows = []
             with open(self.save_filepath, 'r', newline='') as file:
                 reader = csv.DictReader(file)
-                existing_data = list(reader)
-                for row in existing_data:
-                    if row["Id"] == save_id:
-                        row.update(data)
-                        save_found = True
-                        break
-            if not save_found:
-                data["Id"] = save_id
-                existing_data.append(data)
+                headers = reader.fieldnames
+                foundID = False
+                for row in reader:
+                    if int(row["Id"]) == int(globalSettings.saveData["Id"]):
+                        row.update(globalSettings.saveData)  # Update the row with new data
+                        foundID = True
+                    rows.append(row)
+                # If the ID was not found that means this is a new save so append it to the end
+                if not foundID:
+                    rows.append(globalSettings.saveData)
 
             with open(self.save_filepath, 'w', newline='') as file:
-                if existing_data:
-                    writer = csv.DictWriter(file, fieldnames=existing_data[0].keys())
-                    writer.writeheader()
-                    writer.writerows(existing_data)
+                writer = csv.DictWriter(file, fieldnames=headers)
+                writer.writeheader()
+                writer.writerows(rows)
+            print("Progress saved successfully.")
+            return 0
         except Exception as e:
             print(f"Error saving data: {e}")
+            return -1
 
     def new_player(self, name=""):
         # Get existing save IDs and find the next unused number
@@ -85,31 +100,38 @@ class SaveFileManager:
                 pass  # Skip any non-integer IDs
 
         # Find the smallest unused integer ID starting from 1
-        next_id = 1
-        while next_id in used_ids:
-            next_id += 1
-
-        # Use the new ID
-        new_id = str(next_id)
+        new_id = 1
+        while new_id in used_ids:
+            new_id += 1
 
         new_data = {
-            "Id": new_id,
-            "Name": name,
-            "Score": "0",
-            "Health": "100",
-            "Team Member 1": "",
-            "Team Member 2": "",
-            "Team Member 3": ""
+            "Id" : new_id,
+            "Name" : name, 
+            "Experience" : 0, 
+            "Level" : 0, 
+            "Current Health" : 100,
+            "Max Health" : 100, 
+            "Team Member 1" : '', 
+            "Team Member 2" : '', 
+            "Team Member 3" : ''
         }
 
-        self.save_data(new_id, new_data)
+        globalSettings.saveData = new_data  # Update the global save data
+        self.save_progress()
         print(f"Created new player save with Id '{new_id}'")
         return new_id  # In case you want to use it after creation
+    
     def login_user(self, saveId, saveData = None):
         if (saveData):
-            globalSettings.saveData = saveData
+            globalSettings.saveData = saveData        
         else:
-            globalSettings.saveData = self.load_save_file(saveId)
+            if saveId != globalSettings.saveData["Id"]:
+                saveFile = self.load_save_file(saveId)
+                if saveFile:
+                    globalSettings.saveData = saveFile
+                else:
+                    print(f"Error: Save file with Id '{saveId}' does not exist.")
+                    return -1
 
 
 # SAVING LOGIC
