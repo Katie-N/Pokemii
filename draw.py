@@ -247,3 +247,12 @@ def draw_save_menu(screen, save_menu_buttons):
         # Draw the text
         draw_text(button[2], pygame.font.Font(None, 36), globalSettings.BLACK, save_menu_surface, button_x + 10, button_y + 10)
     screen.blit(save_menu_surface, (0,0))
+
+def draw_player(screen, player):
+    """Draws the player on the screen."""
+    pygame.draw.rect(screen, player.color, player.rect)
+
+def draw_obstacles(screen, obstacles):
+    """Draws obstacles on the screen."""
+    for obstacle in obstacles:
+        pygame.draw.rect(screen, (0, 255, 0), obstacle)  # Green obstacles
