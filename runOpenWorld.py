@@ -1,8 +1,11 @@
 import pygame
 from movement import Player
+import globalSettings
+from game import Game, GameState
 from worlds.worldLoader import load_world, register_world
 from worlds.world1 import load_world1
 from worlds.world2 import load_world2
+from worlds.world3 import load_world3
 
 # Initialize pygame
 pygame.init()
@@ -18,17 +21,21 @@ player = Player(x=100, y=100, width=50, height=50, color=(255, 0, 0), speed=5)
 # Register worlds
 register_world("world1", load_world1)
 register_world("world2", load_world2)
-
+register_world("world3", load_world3)
+globalSettings.current_state = GameState.GAME_MENU
 # Define a function to update the current world
-def set_current_world(new_world, player):
+def set_current_world(new_world, player, spawn_position=None):
     global current_world, obstacles, slow_obstacles, transition_obstacles
     current_world = new_world
     obstacles, slow_obstacles, transition_obstacles = load_world(current_world, player, set_current_world)
 
+    # Set the player's position if a spawn position is provided
+    if spawn_position:
+        player.rect.x, player.rect.y = spawn_position
+
 # Load the initial world
 current_world = "world1"
 obstacles, slow_obstacles, transition_obstacles = load_world(current_world, player, set_current_world)
-
 # Game loop
 running = True
 clock = pygame.time.Clock()

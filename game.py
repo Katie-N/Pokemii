@@ -9,6 +9,7 @@ class GameState(Enum):
     CREDITS = 1
     GAME_MENU = 2
     OPTIONS = 3
+    OPEN_WORLD = 4 
 
 # --- Game Class ---
 class Game:

@@ -1,6 +1,6 @@
 import pygame
-from worldObstacles import SlowObstacle, TransitionObstacle
-
+import worldObstacles as wo
+import globalSettings as gs
 
 def load_world2(player, set_current_world):
     """Sets up the second world."""
@@ -10,20 +10,25 @@ def load_world2(player, set_current_world):
 
     # Obstacles for World 2
     obstacles = [
-        pygame.Rect(100, 300, 200, 50),  # Example obstacle 1
+        wo.topLeft,
+        wo.topRight,
+        wo.rightTop,
     ]
 
     # Slow obstacles for World 2
     slow_obstacles = [
-        SlowObstacle(400, 300, 150, 150, slow_factor=0.3, color=(0, 255, 255)),
+        wo.SlowObstacle(400, 300, 150, 150, slow_factor=0.3, color=(0, 255, 255)),
     ]
 
     # Transition obstacles for World 2
     transition_obstacles = [
-        TransitionObstacle(
-            700, 500, 100, 100,
-            lambda: set_current_world("world1", player),  # Transition back to World 1
-            color=(255, 255, 0)
+        wo.create_transition_obstacle(
+            300, 0, 150, 50,  # Position and size of the obstacle
+            "world1",  # Target world
+            (400, 550),  # Spawn position in the target world
+            set_current_world,  # Callback to update the current world
+            player,  # Pass the player object
+            color=(255, 255, 0)  # Color of the obstacle
         ),
     ]
 
