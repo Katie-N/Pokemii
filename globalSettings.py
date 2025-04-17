@@ -70,7 +70,12 @@ font = pygame.font.Font(None, FONT_SIZE)
 large_font = pygame.font.Font(None, LARGE_FONT_SIZE)
 
 saveData = {}
-images = None
+images = {}
+spritesheets = {}
+animators = {}
+
+menuAssetsLoaded = False
+fightScreenAssetsLoaded = False
 assets_path = os.path.join(".", "assets")
 menu_path = os.path.join(assets_path, "menus")
 mii_sprites_path = os.path.join(assets_path, "miiSprites")

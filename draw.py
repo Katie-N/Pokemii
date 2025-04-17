@@ -76,6 +76,14 @@ def draw_background(screen: pygame.Surface, backgroundImage: pygame.Surface):
         print("Background image not found!")
         return -1
 
+def draw_player(screen: pygame.Surface, animator, location):
+    frame = animator.get_frame()
+    screen.blit(frame, location)
+
+def draw_players(screen: pygame.Surface):
+    draw_player(screen, globalSettings.animators["player"], (globalSettings.SCREEN_WIDTH / 4, globalSettings.SCREEN_HEIGHT / 2))
+    draw_player(screen, globalSettings.animators["opponent"], (globalSettings.SCREEN_WIDTH / 4, 0))
+    
 def draw_game_menu(screen: pygame.Surface, game_menu_back_button: Button, game_buttons: List[Button]):
     """Draws the game menu screen."""
     # bottom_third_height = globalSettings.SCREEN_HEIGHT // 3
@@ -85,9 +93,9 @@ def draw_game_menu(screen: pygame.Surface, game_menu_back_button: Button, game_b
     game_menu_rect = game_menu_text.get_rect(center=(globalSettings.SCREEN_WIDTH // 2, 100))
     screen.blit(game_menu_text, game_menu_rect)
 
-    circle_radius = 100
-    pygame.draw.circle(screen, globalSettings.BLUE, (circle_radius + 150, globalSettings.SCREEN_HEIGHT - circle_radius - 300), circle_radius)
-    pygame.draw.circle(screen, globalSettings.RED_COLOR, (globalSettings.SCREEN_WIDTH - circle_radius - 150, circle_radius + 250), circle_radius)
+    # circle_radius = 100
+    # pygame.draw.circle(screen, globalSettings.BLUE, (circle_radius + 150, globalSettings.SCREEN_HEIGHT - circle_radius - 300), circle_radius)
+    # pygame.draw.circle(screen, globalSettings.RED_COLOR, (globalSettings.SCREEN_WIDTH - circle_radius - 150, circle_radius + 250), circle_radius)
 
     game_menu_back_button.draw(screen)
 

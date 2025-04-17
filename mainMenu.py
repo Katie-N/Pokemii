@@ -11,64 +11,12 @@ from train import beginTraining
 from compete import beginCompeting
 from importMii import importMiis
 from tradeMii import tradeMiis
+import load_assets
 
 # Initialize Pygame
 pygame.init()
 # Initalize the screen
 globalSettings.screen = pygame.display.set_mode(globalSettings.SCREEN_SIZE)
-
-def load_images():
-    """Loads and scales all of the images as soon as the game is launched"""
-    images = {}
-    try:
-        pic1_path = os.path.join(globalSettings.menu_path, "MiiChannel.png")
-        pic2_path = os.path.join(globalSettings.menu_path, "fightMenu.png")
-        save_image_path = os.path.join(globalSettings.menu_path, "save.png")
-        cursor_image_path = os.path.join(globalSettings.menu_path, "cursor.png")
-        backgroundPicPath = os.path.join(globalSettings.fight_background_path, "blurryWuhu.png")
-        fightingMatsPath = os.path.join(globalSettings.fight_background_path, "fightingMats.png")
-        
-        if os.path.exists(pic1_path):
-            images["mii_channel"] = pygame.image.load(pic1_path).convert()
-            images["mii_channel"] = pygame.transform.scale(images["mii_channel"], globalSettings.SCREEN_SIZE)
-        else:
-            raise FileNotFoundError(f"Image file not found: {pic1_path}")
-
-        if os.path.exists(pic2_path):
-            images["fight_menu"] = pygame.image.load(pic2_path).convert()
-            images["fight_menu"] = pygame.transform.scale(images["fight_menu"], globalSettings.SCREEN_SIZE)
-        else:
-            raise FileNotFoundError(f"Image file not found: {pic2_path}")
-        
-        if os.path.exists(save_image_path):
-            images["save_button"] = pygame.image.load(save_image_path).convert_alpha()
-            images["save_button"] = pygame.transform.scale(images["save_button"], (globalSettings.SAVE_BUTTON_SIZE, globalSettings.SAVE_BUTTON_SIZE))
-        else:
-            raise FileNotFoundError(f"Image file not found: {save_image_path}")
-
-        if os.path.exists(cursor_image_path):
-            images["cursor"] = pygame.image.load(cursor_image_path).convert_alpha()
-            images["cursor"] = pygame.transform.scale(images["cursor"], (75,75))
-        else:
-            raise FileNotFoundError(f"Image file not found: {cursor_image_path}")
-
-        if os.path.exists(backgroundPicPath):
-            images["blurryWuhu"] = pygame.image.load(backgroundPicPath).convert()
-            images["blurryWuhu"] = pygame.transform.scale(images["blurryWuhu"], globalSettings.SCREEN_SIZE)
-        else:
-            raise FileNotFoundError(f"Image file not found: {backgroundPicPath}")    
-    
-        if os.path.exists(fightingMatsPath):
-            images["fightingMats"] = pygame.image.load(fightingMatsPath).convert_alpha()
-            images["fightingMats"] = pygame.transform.scale(images["fightingMats"], globalSettings.SCREEN_SIZE)
-        else:
-            raise FileNotFoundError(f"Image file not found: {fightingMatsPath}")    
-        
-        return images
-
-    except (pygame.error, FileNotFoundError) as e:
-        print(f"Error loading image: {e}")
-        return {}
 
 def handle_menu_sliding(second_menu_visible, menu_offset, menu_slide_speed):
     """Handles the menu sliding logic."""
@@ -142,7 +90,7 @@ def main_menu():
     pygame.display.set_caption("Main Menu")
 
     # Load images
-    globalSettings.images = load_images()
+    load_assets.load_menu_screen_assets()
     if not globalSettings.images:
         return
 
