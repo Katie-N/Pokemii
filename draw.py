@@ -33,6 +33,12 @@ def draw_health_bar(screen: pygame.Surface, x: int, y: int, width: int, height: 
         effect_text = pygame.font.Font(None, globalSettings.FONT_SIZE).render(status_effect, True, globalSettings.BLACK)
         screen.blit(effect_text, (x, y - 30))
 
+def gimpCoordToScreenCoord(x: int, y: int) -> tuple:
+    """Converts a Gimp coordinate (in terms of 1920x1080) to a screen coordinate."""
+    newX = (x / 1920) * globalSettings.SCREEN_WIDTH
+    newY = (y / 1080) * globalSettings.SCREEN_HEIGHT
+    return newX, newY
+
 def draw_experience_bar(screen: pygame.Surface, x: int, y: int, width: int, height: int, experience: int, experience_needed: int, level: int):
     """Draws the experience bar."""
     if experience < 0:
@@ -81,8 +87,12 @@ def draw_player(screen: pygame.Surface, animator, location):
     screen.blit(frame, location)
 
 def draw_players(screen: pygame.Surface):
-    draw_player(screen, globalSettings.animators["player"], (globalSettings.SCREEN_WIDTH / 4, globalSettings.SCREEN_HEIGHT / 2))
-    draw_player(screen, globalSettings.animators["opponent"], (globalSettings.SCREEN_WIDTH / 4, 0))
+    # print(f'{globalSettings.SCREEN_SIZE} {(globalSettings.SCREEN_WIDTH / 3.609) - globalSettings.animators["player"].get_frame().get_width() / 2}, {(globalSettings.SCREEN_HEIGHT / 1.649) - (globalSettings.animators["player"].get_frame().get_height() / 2)}')
+    playerX, playerY = gimpCoordToScreenCoord(520, 617)
+    draw_player(screen, globalSettings.animators["player"], (playerX - globalSettings.animators["player"].get_frame().get_width() / 2, playerY - (globalSettings.animators["player"].get_frame().get_height() / 2)))
+    print(f'Player: {playerX}, {playerY}')
+    opponentX, opponentY = gimpCoordToScreenCoord(1450, 337)
+    draw_player(screen, globalSettings.animators["opponent"], (opponentX - globalSettings.animators["opponent"].get_frame().get_width() / 2, opponentY - globalSettings.animators["opponent"].get_frame().get_height() / 2))
     
 def draw_game_menu(screen: pygame.Surface, game_menu_back_button: Button, game_buttons: List[Button]):
     """Draws the game menu screen."""

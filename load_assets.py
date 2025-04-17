@@ -76,13 +76,9 @@ def load_fight_screen_assets():
     globalSettings.images.update(images)
     print(globalSettings.images)
     
-    # --- Static Images ---
-    # globalSettings.images["background"] = pygame.image.load("assets/background.png").convert()
-    # globalSettings.images["fightingMats"] = pygame.image.load("assets/fightingMats.png").convert_alpha()
-
     # --- Spritesheets ---
-    player_sheet, pw, ph = load_and_scale_spritesheet("assets/miiSprites/levi.png", 512, 512, scale=1.0)
-    opponent_sheet, ow, oh = load_and_scale_spritesheet("assets/miiSprites/liam.png", 512, 512, scale=1.0)
+    player_sheet, pw, ph = load_and_scale_spritesheet("assets/miiSprites/luke.png", 512, 512, scale=0.8)
+    opponent_sheet, ow, oh = load_and_scale_spritesheet("assets/miiSprites/liam.png", 512, 512, scale=0.6)
     print(player_sheet)
     globalSettings.spritesheets["player"] = player_sheet
     globalSettings.spritesheets["opponent"] = opponent_sheet

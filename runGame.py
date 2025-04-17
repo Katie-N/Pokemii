@@ -36,9 +36,9 @@ def run_game():
         globalSettings.screen.fill(globalSettings.WHITE)
         draw.draw_background(globalSettings.screen, globalSettings.images["blurryWuhu"])
         draw.draw_game_HUD(game)
+        draw.draw_players(globalSettings.screen)
         draw.draw_game_menu(globalSettings.screen, game_menu_buttons[-1], game_menu_buttons[:-1])
         draw.draw_turn(globalSettings.screen, game)
-        draw.draw_players(globalSettings.screen)
         
         specialCursor(globalSettings.screen, globalSettings.images["cursor"])
         
